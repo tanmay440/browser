@@ -22,6 +22,7 @@
         content/browser/zen-styles/vapor-shield.css                             (../../zen/shield/vapor-shield.css)
         content/browser/zen-styles/vapor-laser.css                              (../../zen/laser/vapor-laser.css)
         content/browser/zen-styles/vapor-privacy.css                            (../../zen/privacy/vapor-privacy.css)
+*       content/browser/zen-styles/vapor-tab-management.css                      (../../zen/tab-management/vapor-tab-management.css)
 *       content/browser/zen-styles/vapor-routing.css                             (../../zen/routing/vapor-routing.css)
         content/browser/zen-styles/zen-buttons.css                              (../../zen/common/styles/zen-buttons.css)
         content/browser/zen-styles/zen-browser-ui.css                           (../../zen/common/styles/zen-browser-ui.css)

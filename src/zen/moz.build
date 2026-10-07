@@ -27,6 +27,8 @@ DIRS += [
     "spaces",
     "space-routing",
     "routing",
+    "templates",
+    "tab-management",
     "sync",
     "window-drag",
 ]

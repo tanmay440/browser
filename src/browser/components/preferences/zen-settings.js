@@ -35,6 +35,14 @@ const { VaporBroom } = ChromeUtils.importESModule(
   "resource:///modules/zen/privacy/VaporBroom.sys.mjs"
 );
 
+const { VaporWorkspaceTemplates } = ChromeUtils.importESModule(
+  "resource:///modules/zen/templates/VaporWorkspaceTemplates.sys.mjs"
+);
+
+const { VaporTabManagement } = ChromeUtils.importESModule(
+  "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs"
+);
+
 var gVaporShieldSettings = {
   _initialized: false,
   _allRules: "",
@@ -921,8 +929,235 @@ var gZenLooksAndFeel = {
   },
 };
 
+var gVaporWorkspaceTemplateSettings = {
+  _initialized: false,
+  _templates: [],
+  _jsonMode: false,
+
+  _browserWindow() {
+    return Services.wm.getMostRecentWindow("navigator:browser");
+  },
+
+  async init() {
+    if (this._initialized || !document.getElementById("vaporWorkspaceTemplatesList")) {
+      return;
+    }
+    this._initialized = true;
+    const command = (id, callback) => document.getElementById(id)?.addEventListener("command", callback);
+    command("vaporTemplateCreateFromCurrent", () => this._createFromCurrent());
+    command("vaporTemplateImport", () => this._import());
+    command("vaporTemplateExport", () => this._export());
+    command("vaporTemplateApplyExisting", () => this._apply(false));
+    command("vaporTemplateApplyNew", () => this._apply(true));
+    command("vaporTemplateSave", () => this._save());
+    command("vaporTemplateEditJSON", () => this._toggleJSON());
+    command("vaporSnapshotSave", () => this._saveSnapshot());
+    command("vaporSnapshotRestore", () => this._restoreSnapshot());
+    document.getElementById("vaporWorkspaceTemplatesList").addEventListener("select", () => {
+      this._jsonMode = false;
+      document.getElementById("vaporTemplateJSON").hidden = true;
+      this._showSelected();
+    });
+    window.addEventListener("unload", () => {
+      this._initialized = false;
+    }, { once: true });
+    await this._refresh();
+  },
+
+  async _refresh() {
+    this._templates = await VaporWorkspaceTemplates.listTemplates();
+    const list = document.getElementById("vaporWorkspaceTemplatesList");
+    list.replaceChildren();
+    for (const template of this._templates) {
+      const item = document.createXULElement("richlistitem");
+      item.setAttribute("label", `${template.icon} ${template.name}${template.builtIn ? " · built-in" : ""}`);
+      item.setAttribute("description", template.description);
+      item.template = template;
+      list.appendChild(item);
+    }
+    if (list.firstElementChild) {
+      list.selectedIndex = 0;
+    }
+    this._showSelected();
+  },
+
+  _selected() {
+    return document.getElementById("vaporWorkspaceTemplatesList")?.selectedItem?.template;
+  },
+
+  _showSelected() {
+    const template = this._selected();
+    if (!template) {
+      return;
+    }
+    const values = {
+      vaporTemplateName: template.name,
+      vaporTemplateDescription: template.description,
+      vaporTemplateIcon: template.icon,
+      vaporTemplateColor: template.color,
+      vaporTemplateType: template.default_new_tab_type,
+      vaporTemplateURL: template.default_new_tab_url,
+      vaporTemplateSearchName: template.default_search_engine.name,
+      vaporTemplateSearchURL: template.default_search_engine.search_url,
+      vaporTemplateSuggestURL: template.default_search_engine.suggest_url,
+      vaporTemplateScriptMode: template.script_blocking_default,
+      vaporTemplateHibernation: template.tab_hibernation_timeout_minutes,
+      vaporTemplateHomepage: template.homepage,
+      vaporTemplatePinned: template.pinned_tabs.join("\n"),
+      vaporTemplateRemembered: template.remembered_sites.join("\n"),
+      vaporTemplateRememberedScope: template.remembered_sites_scope,
+    };
+    for (const [id, value] of Object.entries(values)) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.value = value;
+      }
+    }
+    for (const [id, value] of [
+      ["vaporTemplateAdblock", template.adblocker_enabled],
+      ["vaporTemplateURLStrip", template.url_stripping_enabled],
+      ["vaporTemplateCNAME", template.cname_uncloaking_enabled],
+      ["vaporTemplateVPN", template.auto_launch_vpn],
+    ]) {
+      document.getElementById(id).checked = value;
+    }
+    document.getElementById("vaporTemplateJSON").value = JSON.stringify(template, null, 2);
+    document.getElementById("vaporTemplateSave").disabled = template.readOnly;
+  },
+
+  _formTemplate() {
+    return {
+      version: "1.0",
+      name: document.getElementById("vaporTemplateName").value.trim(),
+      description: document.getElementById("vaporTemplateDescription").value,
+      icon: document.getElementById("vaporTemplateIcon").value,
+      color: document.getElementById("vaporTemplateColor").value,
+      pinned_tabs: document.getElementById("vaporTemplatePinned").value.split(/\r?\n/).map(value => value.trim()).filter(Boolean),
+      default_new_tab_type: document.getElementById("vaporTemplateType").value,
+      default_new_tab_url: document.getElementById("vaporTemplateURL").value,
+      default_search_engine: {
+        name: document.getElementById("vaporTemplateSearchName").value,
+        search_url: document.getElementById("vaporTemplateSearchURL").value,
+        suggest_url: document.getElementById("vaporTemplateSuggestURL").value,
+      },
+      script_blocking_default: document.getElementById("vaporTemplateScriptMode").value,
+      adblocker_enabled: document.getElementById("vaporTemplateAdblock").checked,
+      url_stripping_enabled: document.getElementById("vaporTemplateURLStrip").checked,
+      cname_uncloaking_enabled: document.getElementById("vaporTemplateCNAME").checked,
+      auto_launch_vpn: document.getElementById("vaporTemplateVPN").checked,
+      tab_hibernation_timeout_minutes: Number(document.getElementById("vaporTemplateHibernation").value) || 0,
+      homepage: document.getElementById("vaporTemplateHomepage").value,
+      remembered_sites: document.getElementById("vaporTemplateRemembered").value.split(/\r?\n/).map(value => value.trim()).filter(Boolean),
+      remembered_sites_scope: document.getElementById("vaporTemplateRememberedScope").value,
+    };
+  },
+
+  async _save() {
+    try {
+      const selected = this._selected();
+      const template = this._jsonMode
+        ? JSON.parse(document.getElementById("vaporTemplateJSON").value)
+        : this._formTemplate();
+      await VaporWorkspaceTemplates.saveTemplate(template, selected?.builtIn ? null : selected?.fileName);
+      await this._refresh();
+    } catch (error) {
+      Services.prompt.alert(window, "Workspace template", error.message);
+    }
+  },
+
+  _toggleJSON() {
+    this._jsonMode = !this._jsonMode;
+    const json = document.getElementById("vaporTemplateJSON");
+    json.hidden = !this._jsonMode;
+    if (this._jsonMode) {
+      json.value = JSON.stringify(this._formTemplate(), null, 2);
+      json.focus();
+    }
+  },
+
+  async _createFromCurrent() {
+    try {
+      const browserWindow = this._browserWindow();
+      const template = await VaporWorkspaceTemplates.createFromCurrentWorkspace(browserWindow);
+      await VaporWorkspaceTemplates.saveTemplate(template);
+      await this._refresh();
+    } catch (error) {
+      Services.prompt.alert(window, "Workspace template", error.message);
+    }
+  },
+
+  async _apply(create) {
+    const selected = this._selected();
+    const browserWindow = this._browserWindow();
+    if (!selected || !browserWindow) {
+      return;
+    }
+    try {
+      const workspace = create ? null : browserWindow.gZenWorkspaces.getActiveWorkspace();
+      await VaporWorkspaceTemplates.applyTemplate(selected, browserWindow, {
+        workspace,
+        create,
+      });
+    } catch (error) {
+      Services.prompt.alert(window, "Workspace template", error.message);
+    }
+  },
+
+  async _import() {
+    const picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    picker.init(window, "Import workspace template", Ci.nsIFilePicker.modeOpen);
+    picker.appendFilter("JSON templates", "*.json");
+    if (await new Promise(resolve => picker.open(resolve)) !== Ci.nsIFilePicker.returnOK) {
+      return;
+    }
+    try {
+      await VaporWorkspaceTemplates.importTemplate(picker.file.path);
+      await this._refresh();
+    } catch (error) {
+      Services.prompt.alert(window, "Workspace template", error.message);
+    }
+  },
+
+  async _export() {
+    const selected = this._selected();
+    if (!selected) {
+      return;
+    }
+    const picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    picker.init(window, "Export workspace template", Ci.nsIFilePicker.modeSave);
+    picker.defaultString = `${selected.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.json`;
+    picker.appendFilter("JSON templates", "*.json");
+    if (await new Promise(resolve => picker.open(resolve)) !== Ci.nsIFilePicker.returnOK) {
+      return;
+    }
+    await VaporWorkspaceTemplates.exportTemplate(selected, picker.file.path);
+  },
+
+  async _saveSnapshot() {
+    const picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    picker.init(window, "Save workspace snapshot", Ci.nsIFilePicker.modeSave);
+    picker.defaultString = `vapor-snapshot-${Date.now()}.json`;
+    picker.appendFilter("JSON snapshots", "*.json");
+    if (await new Promise(resolve => picker.open(resolve)) !== Ci.nsIFilePicker.returnOK) {
+      return;
+    }
+    await VaporTabManagement.saveSnapshot(window, picker.file.path);
+  },
+
+  async _restoreSnapshot() {
+    const picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    picker.init(window, "Restore workspace snapshot", Ci.nsIFilePicker.modeOpen);
+    picker.appendFilter("JSON snapshots", "*.json");
+    if (await new Promise(resolve => picker.open(resolve)) !== Ci.nsIFilePicker.returnOK) {
+      return;
+    }
+    await VaporTabManagement.restoreSnapshot(window, picker.file.path);
+  },
+};
+
 var gZenWorkspacesSettings = {
   init() {
+    void gVaporWorkspaceTemplateSettings.init();
     var tabsUnloaderPrefListener = {
       async observe() {
         let buttonIndex = await confirmRestartPrompt(true, 1, true, true);
@@ -1457,6 +1692,11 @@ Preferences.addAll([
     id: "zen.window-sync.sync-only-pinned-tabs",
     type: "bool",
     default: false,
+  },
+  {
+    id: "vapor.tabs.hibernation-timeout-minutes",
+    type: "int",
+    default: 15,
   },
   {
     id: "vapor.routing.default-tab-type",

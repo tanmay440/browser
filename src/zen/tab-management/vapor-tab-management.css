@@ -1,0 +1,40 @@
+/* Round 9 tab management indicators and search surface. */
+.tabbrowser-tab[vapor-hibernated] .tab-label::after {
+  content: " zzz";
+  opacity: .65;
+  font-size: .8em;
+}
+
+#vapor-tab-search-panel {
+  min-width: 520px;
+  max-width: 760px;
+  padding: 8px;
+}
+
+#vapor-tab-search-input {
+  margin-bottom: 6px;
+}
+
+#vapor-tab-search-results {
+  min-height: 150px;
+  max-height: 460px;
+}
+
+.vapor-tab-search-result {
+  min-height: 42px;
+  padding: 5px 8px;
+}
+
+#vapor-crash-recovery {
+  margin: 24px auto;
+  max-width: 680px;
+  padding: 18px;
+  border: 1px solid #d44;
+  border-radius: 8px;
+  background: color-mix(in srgb, #d44 10%, transparent);
+}
+
+#vapor-crash-recovery button {
+  margin-inline-end: 8px;
+  padding: 7px 12px;
+}

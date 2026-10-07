@@ -77,6 +77,56 @@
       </hbox>
 </groupbox>
 
+<groupbox id="vaporWorkspaceTemplatesGroup" data-category="paneZenTabManagement" hidden="true" class="highlighting-group">
+      <label><html:h2 data-l10n-id="vapor-workspace-templates-header"/></label>
+      <description class="description-deemphasized" data-l10n-id="vapor-workspace-templates-description" />
+      <hbox align="center">
+            <richlistbox id="vaporWorkspaceTemplatesList" flex="1" rows="5" seltype="single"/>
+            <vbox>
+                  <button id="vaporTemplateCreateFromCurrent" data-l10n-id="vapor-workspace-template-create-current"/>
+                  <button id="vaporTemplateImport" data-l10n-id="vapor-workspace-template-import"/>
+                  <button id="vaporTemplateExport" data-l10n-id="vapor-workspace-template-export"/>
+                  <button id="vaporTemplateApplyExisting" data-l10n-id="vapor-workspace-template-apply-existing"/>
+                  <button id="vaporTemplateApplyNew" data-l10n-id="vapor-workspace-template-apply-new"/>
+            </vbox>
+      </hbox>
+      <grid id="vaporWorkspaceTemplateFormGrid">
+            <columns><column/><column flex="1"/></columns>
+            <rows>
+                  <row><label control="vaporTemplateName" data-l10n-id="vapor-workspace-template-name"/><textbox id="vaporTemplateName"/></row>
+                  <row><label control="vaporTemplateDescription" data-l10n-id="vapor-workspace-template-description-field"/><textbox id="vaporTemplateDescription"/></row>
+                  <row><label control="vaporTemplateIcon" data-l10n-id="vapor-workspace-template-icon"/><textbox id="vaporTemplateIcon"/></row>
+                  <row><label control="vaporTemplateColor" data-l10n-id="vapor-workspace-template-color"/><textbox id="vaporTemplateColor"/></row>
+                  <row><label control="vaporTemplateType" data-l10n-id="vapor-workspace-template-default-type"/><menulist id="vaporTemplateType"><menupopup><menuitem value="regular" label="Regular"/><menuitem value="tor" label="Tor"/><menuitem value="scramjet" label="Scramjet"/></menupopup></menulist></row>
+                  <row><label control="vaporTemplateURL" data-l10n-id="vapor-workspace-template-default-url"/><textbox id="vaporTemplateURL"/></row>
+                  <row><label control="vaporTemplateSearchName" data-l10n-id="vapor-workspace-template-search-name"/><textbox id="vaporTemplateSearchName"/></row>
+                  <row><label control="vaporTemplateSearchURL" data-l10n-id="vapor-workspace-template-search-url"/><textbox id="vaporTemplateSearchURL"/></row>
+                  <row><label control="vaporTemplateSuggestURL" data-l10n-id="vapor-workspace-template-suggest-url"/><textbox id="vaporTemplateSuggestURL"/></row>
+                  <row><label control="vaporTemplateScriptMode" data-l10n-id="vapor-workspace-template-script-mode"/><menulist id="vaporTemplateScriptMode"><menupopup><menuitem value="allow-all" label="Allow all"/><menuitem value="first-party-only" label="First-party only"/><menuitem value="block-all" label="Block all"/></menupopup></menulist></row>
+                  <row><label control="vaporTemplateHibernation" data-l10n-id="vapor-workspace-template-hibernation"/><textbox id="vaporTemplateHibernation" type="number"/></row>
+                  <row><label control="vaporTemplateHomepage" data-l10n-id="vapor-workspace-template-homepage"/><textbox id="vaporTemplateHomepage"/></row>
+                  <row><label control="vaporTemplatePinned" data-l10n-id="vapor-workspace-template-pinned-tabs"/><textbox id="vaporTemplatePinned" multiline="true" rows="3"/></row>
+                  <row><label control="vaporTemplateRemembered" data-l10n-id="vapor-workspace-template-remembered-sites"/><textbox id="vaporTemplateRemembered" multiline="true" rows="3"/></row>
+                  <row><label control="vaporTemplateRememberedScope" data-l10n-id="vapor-workspace-template-remembered-scope"/><menulist id="vaporTemplateRememberedScope"><menupopup><menuitem value="global" label="Global"/><menuitem value="workspace" label="This workspace"/></menupopup></menulist></row>
+            </rows>
+      </grid>
+      <hbox>
+            <checkbox id="vaporTemplateAdblock" data-l10n-id="vapor-workspace-template-adblock"/>
+            <checkbox id="vaporTemplateURLStrip" data-l10n-id="vapor-workspace-template-url-strip"/>
+            <checkbox id="vaporTemplateCNAME" data-l10n-id="vapor-workspace-template-cname"/>
+            <checkbox id="vaporTemplateVPN" data-l10n-id="vapor-workspace-template-vpn"/>
+      </hbox>
+      <hbox>
+            <button id="vaporTemplateSave" data-l10n-id="vapor-workspace-template-save"/>
+            <button id="vaporTemplateEditJSON" data-l10n-id="vapor-workspace-template-edit-json"/>
+      </hbox>
+      <textbox id="vaporTemplateJSON" multiline="true" rows="12" hidden="true"/>
+      <hbox>
+            <button id="vaporSnapshotSave" data-l10n-id="vapor-workspace-snapshot-save"/>
+            <button id="vaporSnapshotRestore" data-l10n-id="vapor-workspace-snapshot-restore"/>
+      </hbox>
+</groupbox>
+
 </html:template>
 
 

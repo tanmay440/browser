@@ -189,6 +189,12 @@ export class VaporRoutingService {
     if (!TAB_TYPES.has(type)) {
       type = "regular";
     }
+    if (url === "about:newtab") {
+      const workspace =
+        window.gZenWorkspaces?.getActiveWorkspace?.() ||
+        window.gZenWorkspaces?.getActiveWorkspaceFromCache?.();
+      url = workspace?.defaultNewTabUrl || url;
+    }
 
     const identity = type === "regular" ? null : this.#ensureIdentity(type);
     const proxyURL = type === "scramjet" ? this.#scramjetProxyURL() : "";

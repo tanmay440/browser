@@ -66,6 +66,9 @@
 - name: vapor.privacy.script-blocking.enabled
   value: true
 
+- name: vapor.privacy.script-blocking.default-state
+  value: first-party
+
 # Vapor Round 7 storage privacy.
 - name: vapor.broom.enabled
   value: true
@@ -142,3 +145,7 @@
 
 - name: vapor.routing.tor.kill-on-last-tab
   value: true
+
+
+- name: vapor.tabs.hibernation-timeout-minutes
+  value: 15

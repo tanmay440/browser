@@ -120,6 +120,21 @@ let JSWINDOWACTORS = {
     remoteTypes: ["web", "file"],
     safeForUntrustedWebProcess: true,
   },
+  VaporTabManagement: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporTabManagementParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporTabManagementChild.sys.mjs",
+      events: {
+        DOMContentLoaded: {},
+      },
+    },
+    matches: ["about:tabcrashed"],
+    allFrames: false,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
   VaporPrivacy: {
     parent: {
       esModuleURI: "resource:///actors/VaporPrivacyParent.sys.mjs",

@@ -34,6 +34,7 @@ export const PREF_TIMEZONE = "vapor.privacy.fingerprinting.timezone";
 export const PREF_LANGUAGE = "vapor.privacy.fingerprinting.language";
 export const PREF_CLIPBOARD = "vapor.privacy.clipboard.enabled";
 export const PREF_SCRIPT_BLOCKING = "vapor.privacy.script-blocking.enabled";
+export const PREF_SCRIPT_DEFAULT_STATE = "vapor.privacy.script-blocking.default-state";
 
 export const URL_STRIPPING_PERMISSION = "vapor-url-stripping";
 export const REFERRER_PERMISSION = "vapor-referrer";
@@ -427,7 +428,8 @@ class VaporPrivacyService {
   }
 
   getScriptState(host) {
-    return this.#scriptStates.get(normalizeHost(host)) || DEFAULT_SCRIPT_STATE;
+    return this.#scriptStates.get(normalizeHost(host)) ||
+      Services.prefs.getStringPref(PREF_SCRIPT_DEFAULT_STATE, DEFAULT_SCRIPT_STATE);
   }
 
   getEffectiveScriptState(uri) {

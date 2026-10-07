@@ -24,7 +24,9 @@ function renderEntries(output, entries, emptyText) {
     const kind = document.createElement("strong");
     kind.textContent = entry.kind || "Vapor";
     const details = document.createElement("span");
-    details.textContent = ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
+    details.textContent = entry.kind === "Crashes"
+      ? ` ${entry.url || "unknown URL"} — memory: ${entry.memory || "unknown"}; cause: ${entry.cause || "unknown"} (${new Date(entry.time).toLocaleString()})`
+      : ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
     item.append(kind, details);
     output.appendChild(item);
   }
@@ -47,9 +49,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     const { VaporPrivacy } = ChromeUtils.importESModule(
       "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs"
     );
-    const [filterEntries, privacyEntries] = await Promise.all([
+    const { VaporTabManagement } = ChromeUtils.importESModule(
+      "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs"
+    );
+    const [filterEntries, privacyEntries, crashEntries] = await Promise.all([
       VaporFilter.getActivityLog(),
       VaporPrivacy.getActivityLog(),
+      VaporTabManagement.getCrashLog(),
     ]);
     renderEntries(
       document.getElementById("dom-filters-log"),
@@ -72,6 +78,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       dnsEntries,
       "No local DNS activity yet.",
     );
+    renderEntries(
+      document.getElementById("crashes-log"),
+      crashEntries,
+      "No tab crashes have been recorded.",
+    );
+    document.getElementById("crashes-summary").textContent =
+      `${crashEntries.length} local tab crashes.`;
     document.getElementById("dom-filters-summary").textContent =
       `${filterEntries.length} local filter actions. Nothing is sent off this device.`;
     document.getElementById("privacy-summary").textContent =
@@ -81,7 +94,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("dns-summary").textContent =
       `${dnsEntries.length} local DNS and CNAME events.`;
   } catch {
-    for (const id of ["dom-filters-log", "privacy-log", "consent-log", "dns-log"]) {
+    for (const id of ["dom-filters-log", "privacy-log", "consent-log", "dns-log", "crashes-log"]) {
       const output = document.getElementById(id);
       output.replaceChildren();
       output.appendChild(document.createElement("li")).textContent =
