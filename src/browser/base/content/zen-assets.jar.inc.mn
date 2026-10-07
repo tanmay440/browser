@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include ../../../zen/common/jar.inc.mn
+#include ../../../zen/shield/jar.inc.mn
 #include ../../../zen/compact-mode/jar.inc.mn
 #include ../../../zen/drag-and-drop/jar.inc.mn
 #include ../../../zen/split-view/jar.inc.mn

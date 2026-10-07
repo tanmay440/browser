@@ -1,0 +1,12 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# The package declaration is included from browser.jar's manifest. It gives
+# Round 2's blank responses the requested chrome://vapor/content/ URLs.
+% content vapor %content/vapor/ contentaccessible=yes
+        content/vapor/blank.png                                             (../../zen/shield/blank.png)
+        content/vapor/blank.js                                              (../../zen/shield/blank.js)
+        content/vapor/blank.css                                             (../../zen/shield/blank.css)
+        content/vapor/blank.html                                            (../../zen/shield/blank.html)
+        content/vapor/default.txt                                            (../../zen/shield/default.txt)

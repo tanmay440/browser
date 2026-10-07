@@ -1,0 +1,49 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<html:template id="template-paneVaporShield">
+  <hbox id="vaporShieldCategory"
+        class="subcategory"
+        data-category="paneVaporShield">
+    <html:h1 data-l10n-id="pane-vapor-shield-title"/>
+  </hbox>
+
+  <groupbox id="vaporShieldGroup"
+            data-category="paneVaporShield"
+            class="highlighting-group">
+    <label><html:h2 data-l10n-id="vapor-shield-settings-header"/></label>
+    <description class="description-deemphasized"
+                 data-l10n-id="vapor-shield-settings-description" />
+
+    <checkbox id="vaporShieldEnabled"
+              preference="vapor.shield.enabled"
+              data-l10n-id="vapor-shield-enable" />
+    <checkbox id="vaporShieldConsent"
+              preference="vapor.shield.block-consent-popups"
+              data-l10n-id="vapor-shield-consent" />
+    <checkbox id="vaporShieldMiners"
+              preference="vapor.shield.block-crypto-miners"
+              data-l10n-id="vapor-shield-miners" />
+
+    <hbox align="center" class="vapor-shield-rule-toolbar">
+      <label id="vaporShieldRuleCount" data-l10n-id="vapor-shield-rule-count" />
+      <spacer flex="1" />
+      <button id="vaporShieldImport"
+              data-l10n-id="vapor-shield-import" />
+      <button id="vaporShieldExport"
+              data-l10n-id="vapor-shield-export" />
+      <button id="vaporShieldReset"
+              data-l10n-id="vapor-shield-reset" />
+    </hbox>
+
+    <hbox align="center">
+      <label for="vaporShieldSearch" data-l10n-id="vapor-shield-search" />
+      <html:input id="vaporShieldSearch" type="search" />
+    </hbox>
+    <html:textarea id="vaporShieldRules"
+                   rows="12"
+                   readonly="readonly"
+                   aria-label="Vapor Shield blocklist" />
+  </groupbox>
+</html:template>

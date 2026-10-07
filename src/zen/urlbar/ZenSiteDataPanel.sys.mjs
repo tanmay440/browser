@@ -14,12 +14,14 @@ const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   FeatureCallout: "resource:///modules/asrouter/FeatureCallout.sys.mjs",
   gZenBoostsManager: "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs",
+  VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
 });
 
 export class nsZenSiteDataPanel {
   #iconMap = {
     install: "extension",
     "site-protection": "shield",
+    "vapor-shield": "shield",
     "3rdPartyStorage": "cookie",
   };
 
@@ -589,6 +591,29 @@ export class nsZenSiteDataPanel {
       }
     }
 
+    // Add Vapor Shield as a persistent per-site permission. An explicit DENY
+    // is a site exception; an explicit ALLOW can force the Shield on when the
+    // global switch is off.
+    if (
+      gBrowser.currentURI.schemeIs("http") ||
+      gBrowser.currentURI.schemeIs("https")
+    ) {
+      const sitePermission = lazy.VaporShield.getSitePermission(
+        gBrowser.currentURI
+      );
+      const shieldEnabled =
+        sitePermission === Ci.nsIPermissionManager.DENY_ACTION
+          ? false
+          : sitePermission === Ci.nsIPermissionManager.ALLOW_ACTION
+            ? true
+            : lazy.VaporShield.enabled;
+      permissions.push({
+        id: "vapor-shield",
+        state: shieldEnabled ? SitePermissions.ALLOW : SitePermissions.BLOCK,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
+    }
+
     // Add site protection permissions if needed.
     const { gProtectionsHandler } = this.window;
     if (
@@ -657,11 +682,17 @@ export class nsZenSiteDataPanel {
         if (permission.id === "site-protection") {
           return "zen-site-data-protections-enabled";
         }
+        if (permission.id === "vapor-shield") {
+          return "zen-site-data-vapor-shield-enabled";
+        }
         return "zen-site-data-setting-allow";
       case SitePermissions.BLOCK:
       case SitePermissions.AUTOPLAY_BLOCKED_ALL:
         if (permission.id === "site-protection") {
           return "zen-site-data-protections-disabled";
+        }
+        if (permission.id === "vapor-shield") {
+          return "zen-site-data-vapor-shield-disabled";
         }
         return "zen-site-data-setting-block";
       default:
@@ -711,6 +742,11 @@ export class nsZenSiteDataPanel {
       this.document.l10n.setAttributes(
         nameLabel,
         "zen-site-data-setting-cross-site"
+      );
+    } else if (id === "vapor-shield") {
+      this.document.l10n.setAttributes(
+        nameLabel,
+        "zen-site-data-setting-vapor-shield"
       );
     } else {
       let label = SitePermissions.getPermissionLabel(permission.id);
@@ -841,6 +877,11 @@ export class nsZenSiteDataPanel {
       } else {
         gProtectionsHandler.enableForCurrentPage();
       }
+    } else if (permission.id === "vapor-shield") {
+      lazy.VaporShield.setSitePermission(
+        gBrowser.currentURI,
+        newState === SitePermissions.ALLOW
+      );
     } else {
       SitePermissions.setForPrincipal(
         gBrowser.contentPrincipal,

@@ -28,7 +28,7 @@ index 5a56d348146c1c37c088ced60327fffebcf8fac0..abd65594d365fbc0a74af3953c71f410
    );
    return new Localization(
 -    ["browser/preferences/preferences.ftl", "branding/brand.ftl"],
-+    ["browser/preferences/preferences.ftl", "branding/brand.ftl", "browser/preferences/zen-preferences.ftl"],
++    ["browser/preferences/preferences.ftl", "branding/brand.ftl", "browser/preferences/zen-preferences.ftl", "browser/preferences/vapor-shield.ftl"],
      false,
      undefined,
      locales

@@ -8,9 +8,15 @@
   ChromeUtils.defineESModuleGetters(this, {
     gZenSpaceRoutingManager:
       "resource:///modules/zen/spacerouting/ZenSpaceRoutingManager.sys.mjs",
+    VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
   });
 
   Services.scriptloader.loadSubScript("chrome://browser/content/zen-components/ZenSpaceBookmarksStorage.js", this);
+
+  // Install the parent-process network interceptor before browser startup
+  // begins. It wraps the existing service-worker interception controller so
+  // blocked service-worker fetches are synthesized too.
+  VaporShield.init(window);
 
   let scripts = [
     "chrome://browser/content/ZenStartup.mjs",

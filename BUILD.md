@@ -165,7 +165,11 @@ the three `vapor-*` directories below the active profile as well.
   Windows installer and Start menu.
 - `VaporProfileDirectories.sys.mjs` creates the local-first profile folders at
   startup. The PowerShell helper is provided for deterministic pre-creation.
-- Later-round features from Sections 1–18 are deliberately not added.
+- Round 2 adds `src/zen/shield/VaporShield.sys.mjs`, a local 12,000+ domain
+  default blocklist, persistent `user.txt`, blank response assets, the toolbar
+  switch, per-site Shield permission, and the Adblocker settings pane. Its
+  parser intentionally implements only the simplified Section 1.2 syntax.
+- Later-round features from Sections 2–18 are deliberately not added.
 
 ## Verification checklist
 
@@ -189,3 +193,12 @@ After `./mach run --noprofile`:
    `Vapor/1.0`.
 7. Check `%APPDATA%\Vapor\Profiles\<active-profile>` for
    `vapor-blocklists`, `vapor-templates`, and `vapor-reading-list`.
+8. Verify `vapor-blocklists\default.txt` contains at least 5,000 rules and
+   `user.txt` survives a restart. Use Settings → Adblocker to import and export
+   a `.txt` list, then use the Shield toolbar button and the site permissions
+   panel to test global and per-site switches.
+9. In the network inspector, a blocked image/script/stylesheet/frame should show
+   a synthesized `200 OK` response with `X-Vapor-Shield: blank-response`, not a
+   canceled request. WebSocket handshakes and service-worker fetches use the
+   same interception controller; DNS prefetch and predictor prefetch are locked
+   off for the Windows build.

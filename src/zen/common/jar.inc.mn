@@ -19,6 +19,7 @@
         content/browser/zen-components/ZenEmojiPicker.mjs                       (../../zen/common/emojis/ZenEmojiPicker.mjs)
 
 *       content/browser/zen-styles/zen-theme.css                                (../../zen/common/styles/zen-theme.css)
+        content/browser/zen-styles/vapor-shield.css                             (../../zen/shield/vapor-shield.css)
         content/browser/zen-styles/zen-buttons.css                              (../../zen/common/styles/zen-buttons.css)
         content/browser/zen-styles/zen-browser-ui.css                           (../../zen/common/styles/zen-browser-ui.css)
         content/browser/zen-styles/zen-animations.css                           (../../zen/common/styles/zen-animations.css)

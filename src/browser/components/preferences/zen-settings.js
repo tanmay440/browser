@@ -8,12 +8,114 @@ const { nsZenMultiWindowFeature } = ChromeUtils.importESModule(
   { global: "current" }
 );
 
+const { IOUtils } = ChromeUtils.importESModule(
+  "resource://gre/modules/IOUtils.sys.mjs"
+);
+
 const { nsKeyShortcutModifiers } = ChromeUtils.importESModule(
   "chrome://browser/content/zen-components/ZenKeyboardShortcuts.mjs",
   {
     global: "current",
   }
 );
+
+const { VaporShield } = ChromeUtils.importESModule(
+  "resource:///modules/zen/shield/VaporShield.sys.mjs"
+);
+
+var gVaporShieldSettings = {
+  _initialized: false,
+  _allRules: "",
+
+  async init() {
+    const search = document.getElementById("vaporShieldSearch");
+    if (!search || this._initialized) {
+      return;
+    }
+    this._initialized = true;
+
+    document.getElementById("vaporShieldImport").addEventListener("command", () => {
+      this._importRules();
+    });
+    document.getElementById("vaporShieldExport").addEventListener("command", () => {
+      this._exportRules();
+    });
+    document.getElementById("vaporShieldReset").addEventListener("command", () => {
+      VaporShield.resetUserRules().then(() => this._refresh());
+    });
+    search.addEventListener("input", () => this._render());
+    window.addEventListener("unload", () => {
+      this._initialized = false;
+    }, { once: true });
+
+    await this._refresh();
+  },
+
+  async _refresh() {
+    this._allRules = await VaporShield.getAllRules();
+    this._render();
+  },
+
+  _render() {
+    const search = document.getElementById("vaporShieldSearch");
+    const output = document.getElementById("vaporShieldRules");
+    const count = document.getElementById("vaporShieldRuleCount");
+    if (!search || !output || !count) {
+      return;
+    }
+    const query = search.value.trim().toLowerCase();
+    const lines = this._allRules.split(/\r?\n/).filter(line => {
+      return !query || line.toLowerCase().includes(query);
+    });
+    output.value = lines.join("\n");
+    const rules = this._allRules.split(/\r?\n/).filter(line => {
+      return (
+        line.trim() &&
+        !line.trim().startsWith("#") &&
+        !line.trim().startsWith("!")
+      );
+    });
+    count.textContent = `${rules.length} rules`;
+  },
+
+  _openPicker(mode, title) {
+    const fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    fp.init(window.browsingContext, title, mode);
+    fp.defaultString = "user.txt";
+    fp.appendFilter("Text files", "*.txt");
+    fp.appendFilters(Ci.nsIFilePicker.filterAll);
+    return fp;
+  },
+
+  async _importRules() {
+    const fp = this._openPicker(Ci.nsIFilePicker.modeOpen, "Import Vapor Shield blocklist");
+    fp.open(async result => {
+      if (result !== Ci.nsIFilePicker.returnOK || !fp.file) {
+        return;
+      }
+      try {
+        await VaporShield.importUserRules(await IOUtils.readUTF8(fp.file.path));
+        await this._refresh();
+      } catch (error) {
+        console.error("Vapor Shield import failed", error);
+      }
+    });
+  },
+
+  async _exportRules() {
+    const fp = this._openPicker(Ci.nsIFilePicker.modeSave, "Export Vapor Shield user blocklist");
+    fp.open(async result => {
+      if (result !== Ci.nsIFilePicker.returnOK || !fp.file) {
+        return;
+      }
+      try {
+        await IOUtils.writeUTF8(fp.file.path, await VaporShield.getUserRules());
+      } catch (error) {
+        console.error("Vapor Shield export failed", error);
+      }
+    });
+  },
+};
 
 var gZenMarketplaceManager = {
   async init() {
@@ -1252,6 +1354,21 @@ Preferences.addAll([
     id: "zen.window-sync.sync-only-pinned-tabs",
     type: "bool",
     default: false,
+  },
+  {
+    id: "vapor.shield.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.shield.block-consent-popups",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.shield.block-crypto-miners",
+    type: "bool",
+    default: true,
   },
 ]);
 

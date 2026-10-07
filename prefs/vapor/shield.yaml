@@ -1,0 +1,24 @@
+# Vapor Shield Round 2 preferences.
+# The global switch is user-controlled; the network interceptor consumes these
+# values in the parent process. DNS prefetch is disabled so blocked hosts are not
+# resolved speculatively before the request matcher sees them.
+- name: vapor.shield.enabled
+  value: true
+
+- name: vapor.shield.block-consent-popups
+  value: true
+
+- name: vapor.shield.block-crypto-miners
+  value: true
+
+- name: network.dns.disablePrefetch
+  value: true
+  locked: true
+
+- name: network.predictor.enabled
+  value: false
+  locked: true
+
+- name: network.predictor.enable-prefetch
+  value: false
+  locked: true
