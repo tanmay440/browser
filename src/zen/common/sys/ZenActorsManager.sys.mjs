@@ -75,6 +75,20 @@ let JSWINDOWACTORS = {
     safeForUntrustedWebProcess: true,
     enablePreference: "zen.view.drag-window-from-content",
   },
+  VaporLaser: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporLaserParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporLaserChild.sys.mjs",
+      events: {
+        DOMContentLoaded: {},
+      },
+    },
+    allFrames: true,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
 };
 
 if (!Services.appinfo.inSafeMode) {

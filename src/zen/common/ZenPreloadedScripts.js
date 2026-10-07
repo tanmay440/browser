@@ -9,6 +9,7 @@
     gZenSpaceRoutingManager:
       "resource:///modules/zen/spacerouting/ZenSpaceRoutingManager.sys.mjs",
     VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
+    VaporLaser: "resource:///modules/zen/laser/VaporLaser.sys.mjs",
   });
 
   Services.scriptloader.loadSubScript("chrome://browser/content/zen-components/ZenSpaceBookmarksStorage.js", this);
@@ -17,6 +18,7 @@
   // begins. It wraps the existing service-worker interception controller so
   // blocked service-worker fetches are synthesized too.
   VaporShield.init(window);
+  VaporLaser.init(window);
 
   let scripts = [
     "chrome://browser/content/ZenStartup.mjs",

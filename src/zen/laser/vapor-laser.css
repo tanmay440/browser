@@ -1,0 +1,13 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#vapor-laser-button {
+  list-style-image: url("chrome://browser/content/zen-images/vapor-laser.svg");
+}
+
+#vapor-laser-button[laser-active="true"] {
+  color: #ff2d2d;
+  fill: #ff2d2d;
+  filter: drop-shadow(0 0 3px rgba(255, 0, 0, 0.65));
+}

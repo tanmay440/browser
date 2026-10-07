@@ -169,7 +169,10 @@ the three `vapor-*` directories below the active profile as well.
   default blocklist, persistent `user.txt`, blank response assets, the toolbar
   switch, per-site Shield permission, and the Adblocker settings pane. Its
   parser intentionally implements only the simplified Section 1.2 syntax.
-- Later-round features from Sections 2–18 are deliberately not added.
+- Round 3 adds `src/zen/laser/`, a browser/content-process Laser actor pair,
+  Ctrl+Shift+L activation, the crosshair/vignette/HUD, smart targeting,
+  particle vaporization, local user-rule extraction, and ten-second undo.
+- Later-round features from Sections 3–18 are deliberately not added.
 
 ## Verification checklist
 

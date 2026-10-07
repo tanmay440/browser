@@ -394,6 +394,112 @@ export class VaporShieldService {
     return IOUtils.readUTF8(path).catch(() => "");
   }
 
+  async addLaserRules(entries, pageURL = "", notes = []) {
+    await this.#loadPromise?.catch(() => {});
+    const directory = PathUtils.join(PathUtils.profileDir, BLOCKLIST_DIRECTORY);
+    await IOUtils.makeDirectory(directory, {
+      createAncestors: true,
+      ignoreExisting: true,
+    });
+    const defaultPath = PathUtils.join(directory, DEFAULT_BLOCKLIST);
+    const userPath = PathUtils.join(directory, USER_BLOCKLIST);
+    const [defaultText, userText] = await Promise.all([
+      IOUtils.readUTF8(defaultPath).catch(() => ""),
+      IOUtils.readUTF8(userPath).catch(() => ""),
+    ]);
+    const existing = new Set(
+      `${defaultText}\n${userText}`
+        .split(/\r?\n/)
+        .map((line) => line.trim().toLowerCase())
+        .filter(
+          (line) => line && !line.startsWith("#") && !line.startsWith("!"),
+        ),
+    );
+    const lines = [];
+    const added = [];
+    const safePageURL = String(pageURL || "").replace(/[\r\n]/g, " ");
+    const timestamp = new Date().toISOString();
+
+    for (const entry of Array.isArray(entries) ? entries : []) {
+      const rule = String(entry?.rule || "").trim();
+      if (
+        !rule ||
+        rule.length > 2048 ||
+        /[\r\n]/.test(rule) ||
+        (!rule.startsWith("||") && !/^[a-z0-9.-]+$/i.test(rule))
+      ) {
+        continue;
+      }
+      const key = rule.toLowerCase();
+      if (existing.has(key)) {
+        continue;
+      }
+      const suffix = entry.sameOrigin ? " (same-origin)" : "";
+      lines.push(
+        `# Added by laser on ${timestamp}${suffix}${safePageURL ? ` from ${safePageURL}` : ""}`,
+        rule,
+      );
+      existing.add(key);
+      added.push(rule);
+    }
+
+    for (const note of Array.isArray(notes) ? notes : []) {
+      const safeNote = String(note || "")
+        .replace(/[\r\n]/g, " ")
+        .trim();
+      if (safeNote) {
+        lines.push(`# Added by laser on ${timestamp}: ${safeNote}`);
+      }
+    }
+
+    if (!lines.length) {
+      return [];
+    }
+    const separator = userText && !userText.endsWith("\n") ? "\n" : "";
+    await IOUtils.writeUTF8(
+      userPath,
+      `${userText}${separator}${lines.join("\n")}\\n`,
+    );
+    await this.reload();
+    return added;
+  }
+
+  async removeUserRules(rules) {
+    const path = PathUtils.join(
+      PathUtils.profileDir,
+      BLOCKLIST_DIRECTORY,
+      USER_BLOCKLIST,
+    );
+    const userText = await IOUtils.readUTF8(path).catch(() => "");
+    const targets = new Set(
+      (Array.isArray(rules) ? rules : [])
+        .map((rule) => String(rule).trim().toLowerCase())
+        .filter(Boolean),
+    );
+    if (!targets.size) {
+      return [];
+    }
+
+    const kept = [];
+    const removed = [];
+    for (const line of userText.split(/\r?\n/)) {
+      if (targets.has(line.trim().toLowerCase())) {
+        if (kept.at(-1)?.startsWith("# Added by laser on ")) {
+          kept.pop();
+        }
+        removed.push(line.trim());
+      } else {
+        kept.push(line);
+      }
+    }
+    if (!removed.length) {
+      return [];
+    }
+    await IOUtils.writeUTF8(path, kept.join("\n").replace(/\n+$/, "") + "\n");
+    await this.reload();
+    return removed;
+  }
+
   async getAllRules() {
     const directory = PathUtils.join(PathUtils.profileDir, BLOCKLIST_DIRECTORY);
     const [defaults, user] = await Promise.all([
