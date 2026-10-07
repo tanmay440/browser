@@ -16,6 +16,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
   gZenBoostsManager: "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs",
   VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
   VaporFilter: "resource:///modules/zen/filter/VaporFilter.sys.mjs",
+  VaporPrivacy: "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
 });
 
 export class nsZenSiteDataPanel {
@@ -24,6 +25,8 @@ export class nsZenSiteDataPanel {
     "site-protection": "shield",
     "vapor-shield": "shield",
     "vapor-filter": "shield",
+    "vapor-url-stripping": "shield",
+    "vapor-referrer": "shield",
     "3rdPartyStorage": "cookie",
   };
 
@@ -629,6 +632,34 @@ export class nsZenSiteDataPanel {
         state: filterEnabled ? SitePermissions.ALLOW : SitePermissions.BLOCK,
         scope: SitePermissions.SCOPE_PERSISTENT,
       });
+
+      const urlStripPermission = lazy.VaporPrivacy.getSitePermission(
+        gBrowser.currentURI,
+        "vapor-url-stripping",
+      );
+      const urlStrippingEnabled =
+        urlStripPermission === Ci.nsIPermissionManager.DENY_ACTION
+          ? false
+          : urlStripPermission === Ci.nsIPermissionManager.ALLOW_ACTION
+            ? true
+            : lazy.VaporPrivacy.urlStrippingEnabled;
+      permissions.push({
+        id: "vapor-url-stripping",
+        state: urlStrippingEnabled ? SitePermissions.ALLOW : SitePermissions.BLOCK,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
+
+      const referrerPermission = lazy.VaporPrivacy.getSitePermission(
+        gBrowser.currentURI,
+        "vapor-referrer",
+      );
+      permissions.push({
+        id: "vapor-referrer",
+        state: referrerPermission === Ci.nsIPermissionManager.ALLOW_ACTION
+          ? SitePermissions.ALLOW
+          : SitePermissions.BLOCK,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
     }
 
     // Add site protection permissions if needed.
@@ -705,6 +736,12 @@ export class nsZenSiteDataPanel {
         if (permission.id === "vapor-filter") {
           return "zen-site-data-vapor-filter-enabled";
         }
+        if (permission.id === "vapor-url-stripping") {
+          return "zen-site-data-vapor-url-stripping-enabled";
+        }
+        if (permission.id === "vapor-referrer") {
+          return "zen-site-data-vapor-referrer-enabled";
+        }
         return "zen-site-data-setting-allow";
       case SitePermissions.BLOCK:
       case SitePermissions.AUTOPLAY_BLOCKED_ALL:
@@ -716,6 +753,12 @@ export class nsZenSiteDataPanel {
         }
         if (permission.id === "vapor-filter") {
           return "zen-site-data-vapor-filter-disabled";
+        }
+        if (permission.id === "vapor-url-stripping") {
+          return "zen-site-data-vapor-url-stripping-disabled";
+        }
+        if (permission.id === "vapor-referrer") {
+          return "zen-site-data-vapor-referrer-disabled";
         }
         return "zen-site-data-setting-block";
       default:
@@ -775,6 +818,16 @@ export class nsZenSiteDataPanel {
       this.document.l10n.setAttributes(
         nameLabel,
         "zen-site-data-setting-vapor-filter"
+      );
+    } else if (id === "vapor-url-stripping") {
+      this.document.l10n.setAttributes(
+        nameLabel,
+        "zen-site-data-setting-vapor-url-stripping"
+      );
+    } else if (id === "vapor-referrer") {
+      this.document.l10n.setAttributes(
+        nameLabel,
+        "zen-site-data-setting-vapor-referrer"
       );
     } else {
       let label = SitePermissions.getPermissionLabel(permission.id);
@@ -914,6 +967,15 @@ export class nsZenSiteDataPanel {
       lazy.VaporFilter.setSitePermission(
         gBrowser.currentURI,
         newState === SitePermissions.ALLOW
+      );
+    } else if (
+      permission.id === "vapor-url-stripping" ||
+      permission.id === "vapor-referrer"
+    ) {
+      lazy.VaporPrivacy.setSitePermission(
+        gBrowser.currentURI,
+        permission.id,
+        newState === SitePermissions.ALLOW,
       );
     } else {
       SitePermissions.setForPrincipal(

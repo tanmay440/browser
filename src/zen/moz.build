@@ -11,6 +11,7 @@ DIRS += [
     "common",
     "shield",
     "filter",
+    "privacy",
     "laser",
     "compact-mode",
     "drag-and-drop",

@@ -11,3 +11,4 @@
         content/vapor/blank.html                                            (../../zen/shield/blank.html)
         content/vapor/default.txt                                            (../../zen/shield/default.txt)
 #include ../filter/jar.inc.mn
+#include ../privacy/jar.inc.mn

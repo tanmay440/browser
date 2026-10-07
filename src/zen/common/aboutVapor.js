@@ -13,6 +13,23 @@ function buildDateFromBuildID(buildID) {
   return match ? `${match[1]}-${match[2]}-${match[3]}` : "Unavailable";
 }
 
+function renderEntries(output, entries, emptyText) {
+  output.replaceChildren();
+  if (!entries.length) {
+    output.appendChild(document.createElement("li")).textContent = emptyText;
+    return;
+  }
+  for (const entry of entries.slice(0, 100)) {
+    const item = document.createElement("li");
+    const kind = document.createElement("strong");
+    kind.textContent = entry.kind || "Vapor";
+    const details = document.createElement("span");
+    details.textContent = ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
+    item.append(kind, details);
+    output.appendChild(item);
+  }
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   const appInfo = Services.appinfo;
   document.title = "Vapor Browser";
@@ -23,32 +40,45 @@ window.addEventListener("DOMContentLoaded", async () => {
     appInfo.appBuildID
   );
 
-  const output = document.getElementById("dom-filters-log");
-  const summary = document.getElementById("dom-filters-summary");
   try {
     const { VaporFilter } = ChromeUtils.importESModule(
       "resource:///modules/zen/filter/VaporFilter.sys.mjs"
     );
-    const entries = await VaporFilter.getActivityLog();
-    output.replaceChildren();
-    if (!entries.length) {
-      output.appendChild(document.createElement("li")).textContent =
-        "No local filter or Shield Breaker actions yet.";
-      return;
-    }
-    summary.textContent = `${entries.length} local actions. Nothing is sent off this device.`;
-    for (const entry of entries.slice(0, 100)) {
-      const item = document.createElement("li");
-      const kind = document.createElement("strong");
-      kind.textContent = entry.kind || "Vapor";
-      const details = document.createElement("span");
-      details.textContent = ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
-      item.append(kind, details);
-      output.appendChild(item);
-    }
+    const { VaporPrivacy } = ChromeUtils.importESModule(
+      "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs"
+    );
+    const [filterEntries, privacyEntries] = await Promise.all([
+      VaporFilter.getActivityLog(),
+      VaporPrivacy.getActivityLog(),
+    ]);
+    renderEntries(
+      document.getElementById("dom-filters-log"),
+      filterEntries,
+      "No local filter or Shield Breaker actions yet.",
+    );
+    renderEntries(
+      document.getElementById("privacy-log"),
+      privacyEntries.filter(entry => entry.kind !== "DNS"),
+      "No local network privacy actions yet.",
+    );
+    const dnsEntries = privacyEntries.filter(entry => entry.kind === "DNS");
+    renderEntries(
+      document.getElementById("dns-log"),
+      dnsEntries,
+      "No local DNS activity yet.",
+    );
+    document.getElementById("dom-filters-summary").textContent =
+      `${filterEntries.length} local filter actions. Nothing is sent off this device.`;
+    document.getElementById("privacy-summary").textContent =
+      `${privacyEntries.length - dnsEntries.length} local network privacy actions.`;
+    document.getElementById("dns-summary").textContent =
+      `${dnsEntries.length} local DNS and CNAME events.`;
   } catch {
-    output.replaceChildren();
-    output.appendChild(document.createElement("li")).textContent =
-      "Local activity is unavailable until the profile is ready.";
+    for (const id of ["dom-filters-log", "privacy-log", "dns-log"]) {
+      const output = document.getElementById(id);
+      output.replaceChildren();
+      output.appendChild(document.createElement("li")).textContent =
+        "Local activity is unavailable until the profile is ready.";
+    }
   }
 });

@@ -27,6 +27,10 @@ const { VaporFilter } = ChromeUtils.importESModule(
   "resource:///modules/zen/filter/VaporFilter.sys.mjs"
 );
 
+const { VaporPrivacy } = ChromeUtils.importESModule(
+  "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs"
+);
+
 var gVaporShieldSettings = {
   _initialized: false,
   _allRules: "",
@@ -146,6 +150,47 @@ var gVaporShieldSettings = {
     });
   },
 };
+
+var gVaporPrivacySettings = {
+  _initialized: false,
+
+  async init() {
+    if (this._initialized || !document.getElementById("vaporPrivacyGroup")) {
+      return;
+    }
+    this._initialized = true;
+    document.getElementById("vaporPrivacyURLStripSave")?.addEventListener("command", () => {
+      const rules = document.getElementById("vaporPrivacyURLStripRules");
+      VaporPrivacy.setURLStripList(rules.value).then(() => this._refresh());
+    });
+    document.getElementById("vaporHTTPSExceptionsSave")?.addEventListener("command", () => {
+      const exceptions = document.getElementById("vaporHTTPSExceptions");
+      VaporPrivacy.setHTTPSExceptions(exceptions.value).then(() => this._refresh());
+    });
+    document.getElementById("vaporPrivacyDohResolver")?.addEventListener("command", () => {
+      VaporPrivacy.configureDoH();
+      this._refresh();
+    });
+    await this._refresh();
+  },
+
+  async _refresh() {
+    const rules = document.getElementById("vaporPrivacyURLStripRules");
+    const exceptions = document.getElementById("vaporHTTPSExceptions");
+    const status = document.getElementById("vaporPrivacyDohStatus");
+    if (!rules || !exceptions || !status) {
+      return;
+    }
+    rules.value = await VaporPrivacy.getURLStripList();
+    exceptions.value = await VaporPrivacy.getHTTPSExceptions();
+    const resolver = Services.prefs.getStringPref("vapor.privacy.doh.resolver", "mullvad");
+    status.textContent = `${VaporPrivacy.dohEnabled ? "DoH enabled" : "DoH disabled"} — ${resolver}`;
+  },
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  gVaporPrivacySettings.init();
+});
 
 var gZenMarketplaceManager = {
   async init() {
@@ -1402,6 +1447,36 @@ Preferences.addAll([
   },
   {
     id: "vapor.shield.block-crypto-miners",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.url-stripping.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.cname-uncloaking.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.referrer-policy",
+    type: "string",
+    default: "strict-origin-when-cross-origin",
+  },
+  {
+    id: "vapor.privacy.doh.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.doh.resolver",
+    type: "string",
+    default: "mullvad",
+  },
+  {
+    id: "vapor.privacy.speculative-loading.enabled",
     type: "bool",
     default: true,
   },

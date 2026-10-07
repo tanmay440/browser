@@ -8,6 +8,11 @@ import { PathUtils } from "resource://gre/modules/PathUtils.sys.mjs";
 import { Services } from "resource://gre/modules/Services.sys.mjs";
 import { CustomizableUI } from "moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs";
 
+const lazy = {};
+ChromeUtils.defineESModuleGetters(lazy, {
+  VaporPrivacy: "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
+});
+
 const PREF_ENABLED = "vapor.shield.enabled";
 const PREF_CONSENT = "vapor.shield.block-consent-popups";
 const PREF_MINERS = "vapor.shield.block-crypto-miners";
@@ -586,7 +591,11 @@ export class VaporShieldService {
     ) {
       return false;
     }
-    if (!this.#rules.matches(spec)) {
+    const cnameBlocked = lazy.VaporPrivacy.shouldBlockCNAME(
+      spec,
+      cnameSpec => this.#rules.matches(cnameSpec),
+    );
+    if (!cnameBlocked && !this.#rules.matches(spec)) {
       return false;
     }
 
@@ -623,18 +632,47 @@ export class VaporShieldService {
       return;
     }
 
-    // Rule loading is asynchronous. Until it completes, leave requests alone;
-    // this avoids blocking navigation on profile I/O during browser startup.
-    if (!this.#loadPromise && !this.shouldBlock(spec, channel)) {
-      return;
+    // Privacy runs first so URL stripping, HTTPS upgrades, speculative-load
+    // cancellation, and the one-hour CNAME lookup all finish before Shield's
+    // blocklist matcher runs. Suspending the request is important: an async
+    // DNS lookup must not let the original URL reach the network first.
+    let suspended = false;
+    try {
+      channel.suspend();
+      suspended = true;
+    } catch {}
+    const resume = () => {
+      if (!suspended) {
+        return;
+      }
+      try {
+        channel.resume();
+      } catch {}
+    };
+    lazy.VaporPrivacy.prepareChannel(channel)
+      .then(() => this.#prepareChannelAfterPrivacy(channel))
+      .catch(error => {
+        console.error("Vapor privacy preparation failed", error);
+        return this.#prepareChannelAfterPrivacy(channel);
+      })
+      .finally(resume);
+  }
+
+  #prepareChannelAfterPrivacy(channel) {
+    if (channel.status && channel.status !== Cr.NS_OK) {
+      return Promise.resolve();
+    }
+    const spec = channel.URI?.spec || "";
+    if (!/^(?:https?|ws|wss):/i.test(spec)) {
+      return Promise.resolve();
     }
     if (this.#loadPromise) {
-      this.#loadPromise
+      return this.#loadPromise
         .then(() => this.#prepareChannelAfterLoad(channel))
         .catch(console.error);
-      return;
     }
     this.#prepareChannelAfterLoad(channel);
+    return Promise.resolve();
   }
 
   #prepareChannelAfterLoad(channel) {

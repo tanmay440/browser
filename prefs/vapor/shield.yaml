@@ -26,3 +26,41 @@
 - name: network.predictor.enable-prefetch
   value: false
   locked: true
+
+# Vapor Round 5 network privacy. HTTPS-only has no global off switch; HTTP
+# exceptions are stored per profile and are granted only after confirmation.
+- name: vapor.privacy.url-stripping.enabled
+  value: true
+
+- name: vapor.privacy.cname-uncloaking.enabled
+  value: true
+
+- name: vapor.privacy.referrer-policy
+  value: strict-origin-when-cross-origin
+
+- name: vapor.privacy.doh.enabled
+  value: true
+
+- name: vapor.privacy.doh.resolver
+  value: mullvad
+
+- name: vapor.privacy.speculative-loading.enabled
+  value: true
+
+- name: network.trr.mode
+  value: 3
+
+- name: network.trr.wait-for-portal
+  value: false
+
+- name: network.http.referrer.defaultPolicy
+  value: 2
+  locked: true
+
+- name: network.http.referrer.defaultPolicy.pbmode
+  value: 2
+  locked: true
+
+- name: network.prefetch-next
+  value: false
+  locked: true

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HTTPS-only mode</title>
+  <link rel="stylesheet" href="chrome://browser/content/zen-styles/about-vapor.css" />
+  <script type="application/javascript" src="chrome://vapor/content/https-warning.js" />
+</head>
+<body>
+  <main class="card https-warning">
+    <h1>HTTPS connection unavailable</h1>
+    <p id="warning-copy">Vapor Browser could not establish a secure connection.</p>
+    <p>To continue over an unencrypted connection, type the domain name exactly as shown.</p>
+    <p><code id="warning-host"></code></p>
+    <input id="warning-confirmation" type="text" autocomplete="off" spellcheck="false" />
+    <button id="warning-continue" type="button" disabled="disabled">Continue over HTTP</button>
+  </main>
+</body>
+</html>

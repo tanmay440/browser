@@ -106,6 +106,20 @@ let JSWINDOWACTORS = {
     remoteTypes: ["web", "file"],
     safeForUntrustedWebProcess: true,
   },
+  VaporPrivacy: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporPrivacyParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporPrivacyChild.sys.mjs",
+      events: {
+        DOMDocElementInserted: {},
+      },
+    },
+    allFrames: true,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
 };
 
 if (!Services.appinfo.inSafeMode) {

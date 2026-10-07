@@ -1,0 +1,75 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<groupbox id="vaporPrivacyGroup"
+          data-category="panePrivacy"
+          class="highlighting-group">
+  <label><html:h2 data-l10n-id="vapor-privacy-settings-header"/></label>
+  <description class="description-deemphasized"
+               data-l10n-id="vapor-privacy-settings-description" />
+
+  <checkbox id="vaporPrivacyURLStripping"
+            preference="vapor.privacy.url-stripping.enabled"
+            data-l10n-id="vapor-privacy-url-stripping" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-url-list" />
+    <spacer flex="1" />
+    <button id="vaporPrivacyURLStripSave"
+            data-l10n-id="vapor-privacy-url-list-save" />
+  </hbox>
+  <html:textarea id="vaporPrivacyURLStripRules"
+                 rows="8"
+                 aria-label="URL stripping list" />
+
+  <checkbox id="vaporPrivacyCNAME"
+            preference="vapor.privacy.cname-uncloaking.enabled"
+            data-l10n-id="vapor-privacy-cname" />
+
+  <hbox align="center">
+    <label for="vaporPrivacyReferrerPolicy"
+           data-l10n-id="vapor-privacy-referrer-policy" />
+    <menulist id="vaporPrivacyReferrerPolicy"
+              preference="vapor.privacy.referrer-policy">
+      <menupopup>
+        <menuitem value="strict-origin-when-cross-origin"
+                  data-l10n-id="vapor-privacy-referrer-strict" />
+        <menuitem value="strict-origin"
+                  data-l10n-id="vapor-privacy-referrer-origin" />
+        <menuitem value="off"
+                  data-l10n-id="vapor-privacy-referrer-off" />
+      </menupopup>
+    </menulist>
+  </hbox>
+
+  <checkbox id="vaporPrivacyDohEnabled"
+            preference="vapor.privacy.doh.enabled"
+            data-l10n-id="vapor-privacy-doh" />
+  <hbox align="center">
+    <label for="vaporPrivacyDohResolver"
+           data-l10n-id="vapor-privacy-doh-resolver" />
+    <menulist id="vaporPrivacyDohResolver"
+              preference="vapor.privacy.doh.resolver">
+      <menupopup>
+        <menuitem value="mullvad" label="Mullvad DNS" />
+        <menuitem value="quad9" label="Quad9" />
+        <menuitem value="nextdns" label="NextDNS" />
+      </menupopup>
+    </menulist>
+    <label id="vaporPrivacyDohStatus" class="description-deemphasized" />
+  </hbox>
+
+  <checkbox id="vaporPrivacySpeculative"
+            preference="vapor.privacy.speculative-loading.enabled"
+            data-l10n-id="vapor-privacy-speculative" />
+
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-https-exceptions" />
+    <spacer flex="1" />
+    <button id="vaporHTTPSExceptionsSave"
+            data-l10n-id="vapor-privacy-https-exceptions-save" />
+  </hbox>
+  <html:textarea id="vaporHTTPSExceptions"
+                 rows="5"
+                 aria-label="HTTPS-only exceptions" />
+</groupbox>
