@@ -171,18 +171,26 @@ var gVaporPrivacySettings = {
       VaporPrivacy.configureDoH();
       this._refresh();
     });
+    document.getElementById("vaporPrivacyUAOverridesSave")?.addEventListener("command", () => {
+      const overrides = document.getElementById("vaporPrivacyUAOverrides");
+      VaporPrivacy.setUAOverrides(overrides.value).then(() => this._refresh());
+    });
     await this._refresh();
   },
 
   async _refresh() {
     const rules = document.getElementById("vaporPrivacyURLStripRules");
     const exceptions = document.getElementById("vaporHTTPSExceptions");
+    const uaOverrides = document.getElementById("vaporPrivacyUAOverrides");
     const status = document.getElementById("vaporPrivacyDohStatus");
     if (!rules || !exceptions || !status) {
       return;
     }
     rules.value = await VaporPrivacy.getURLStripList();
     exceptions.value = await VaporPrivacy.getHTTPSExceptions();
+    if (uaOverrides) {
+      uaOverrides.value = await VaporPrivacy.getUAOverrides();
+    }
     const resolver = Services.prefs.getStringPref("vapor.privacy.doh.resolver", "mullvad");
     status.textContent = `${VaporPrivacy.dohEnabled ? "DoH enabled" : "DoH disabled"} — ${resolver}`;
   },
@@ -1477,6 +1485,36 @@ Preferences.addAll([
   },
   {
     id: "vapor.privacy.speculative-loading.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.fingerprinting.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.fingerprinting.extended",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.fingerprinting.timezone",
+    type: "string",
+    default: "UTC",
+  },
+  {
+    id: "vapor.privacy.fingerprinting.language",
+    type: "string",
+    default: "en-US",
+  },
+  {
+    id: "vapor.privacy.clipboard.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.privacy.script-blocking.enabled",
     type: "bool",
     default: true,
   },

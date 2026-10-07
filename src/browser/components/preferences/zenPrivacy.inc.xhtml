@@ -63,6 +63,47 @@
             preference="vapor.privacy.speculative-loading.enabled"
             data-l10n-id="vapor-privacy-speculative" />
 
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-fingerprinting-header"/></label>
+  <checkbox id="vaporPrivacyFingerprinting"
+            preference="vapor.privacy.fingerprinting.enabled"
+            data-l10n-id="vapor-privacy-fingerprinting" />
+  <checkbox id="vaporPrivacyExtendedFingerprinting"
+            preference="vapor.privacy.fingerprinting.extended"
+            data-l10n-id="vapor-privacy-fingerprinting-extended" />
+  <hbox align="center">
+    <label for="vaporPrivacyTimezone" data-l10n-id="vapor-privacy-timezone" />
+    <menulist id="vaporPrivacyTimezone" preference="vapor.privacy.fingerprinting.timezone">
+      <menupopup><menuitem value="UTC" label="UTC" /></menupopup>
+    </menulist>
+    <label for="vaporPrivacyLanguage" data-l10n-id="vapor-privacy-language" />
+    <menulist id="vaporPrivacyLanguage" preference="vapor.privacy.fingerprinting.language">
+      <menupopup><menuitem value="en-US" label="English (US)" /></menupopup>
+    </menulist>
+  </hbox>
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-clipboard-header"/></label>
+  <checkbox id="vaporPrivacyClipboard"
+            preference="vapor.privacy.clipboard.enabled"
+            data-l10n-id="vapor-privacy-clipboard" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-user-agent-header"/></label>
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-user-agent-list" />
+    <spacer flex="1" />
+    <button id="vaporPrivacyUAOverridesSave" data-l10n-id="vapor-privacy-user-agent-save" />
+  </hbox>
+  <html:textarea id="vaporPrivacyUAOverrides" rows="5" aria-label="User-Agent overrides" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-script-header"/></label>
+  <checkbox id="vaporPrivacyScriptBlocking"
+            preference="vapor.privacy.script-blocking.enabled"
+            data-l10n-id="vapor-privacy-script-blocking" />
+  <description class="description-deemphasized" data-l10n-id="vapor-privacy-script-help" />
+
   <hbox align="center">
     <label data-l10n-id="vapor-privacy-https-exceptions" />
     <spacer flex="1" />

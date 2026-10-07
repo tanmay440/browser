@@ -114,6 +114,9 @@ let JSWINDOWACTORS = {
       esModuleURI: "resource:///actors/VaporPrivacyChild.sys.mjs",
       events: {
         DOMDocElementInserted: {},
+        keydown: {
+          capture: true,
+        },
       },
     },
     allFrames: true,

@@ -1,0 +1,31 @@
+/* Browser-level controls for the Round 6 privacy indicator. */
+#vapor-privacy-indicator {
+  min-width: 22px;
+  margin-inline: 2px;
+  padding-inline: 3px;
+  color: var(--zen-primary-color, currentColor);
+  font-size: 13px;
+  font-weight: 700;
+  opacity: .95;
+}
+
+#vapor-privacy-indicator .vapor-privacy-dot {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#vapor-privacy-indicator[script-state="allow-all"] {
+  color: #2ecc71;
+}
+
+#vapor-privacy-indicator[script-state="first-party"] {
+  color: #f1c40f;
+}
+
+#vapor-privacy-indicator[script-state="block-all"] {
+  color: #e74c3c;
+}
+
+#vapor-privacy-indicator[ua-override="true"] {
+  text-shadow: 0 0 4px #5aa9ff;
+}

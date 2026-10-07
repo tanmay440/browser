@@ -1,5 +1,5 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
+// License, Version 2.0. If a copy of the MPL was not distributed with this
 // file, see http://mozilla.org/MPL/2.0/.
 
 const lazy = {};
@@ -11,14 +11,22 @@ export class VaporPrivacyParent extends JSWindowActorParent {
   async receiveMessage(message) {
     switch (message.name) {
       case "VaporPrivacy:GetConfig":
-        return {
-          enabled: lazy.VaporPrivacy.speculativeLoadingBlocked,
-          href: message.data?.href || "",
-        };
+        return lazy.VaporPrivacy.getBrowserPrivacyConfiguration(
+          message.data?.host || "",
+          message.data?.href || "",
+        );
+      case "VaporPrivacy:ClipboardReadRequest":
+        return lazy.VaporPrivacy.requestClipboardPermission(
+          message.data?.host || "",
+          message.data?.href || "",
+        );
+      case "VaporPrivacy:TemporaryScripts":
+        lazy.VaporPrivacy.allowTemporaryScripts(message.data?.host || "");
+        return true;
       case "VaporPrivacy:Log":
         return lazy.VaporPrivacy.record(
-          message.data?.kind || "Speculative Loading",
-          message.data?.action || "blocked",
+          message.data?.kind || "Browser Privacy",
+          message.data?.action || "action",
           message.data || {},
         );
     }

@@ -47,6 +47,25 @@
 - name: vapor.privacy.speculative-loading.enabled
   value: true
 
+# Vapor Round 6 browser privacy defaults.
+- name: vapor.privacy.fingerprinting.enabled
+  value: true
+
+- name: vapor.privacy.fingerprinting.extended
+  value: true
+
+- name: vapor.privacy.fingerprinting.timezone
+  value: UTC
+
+- name: vapor.privacy.fingerprinting.language
+  value: en-US
+
+- name: vapor.privacy.clipboard.enabled
+  value: true
+
+- name: vapor.privacy.script-blocking.enabled
+  value: true
+
 - name: network.trr.mode
   value: 3
 

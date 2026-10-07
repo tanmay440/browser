@@ -27,6 +27,9 @@ export class nsZenSiteDataPanel {
     "vapor-filter": "shield",
     "vapor-url-stripping": "shield",
     "vapor-referrer": "shield",
+    "vapor-fingerprinting": "shield",
+    "vapor-clipboard": "clipboard",
+    "vapor-script": "shield",
     "3rdPartyStorage": "cookie",
   };
 
@@ -660,6 +663,49 @@ export class nsZenSiteDataPanel {
           : SitePermissions.BLOCK,
         scope: SitePermissions.SCOPE_PERSISTENT,
       });
+
+      const fingerprintPermission = lazy.VaporPrivacy.getSitePermission(
+        gBrowser.currentURI,
+        "vapor-fingerprinting",
+      );
+      permissions.push({
+        id: "vapor-fingerprinting",
+        state: fingerprintPermission === Ci.nsIPermissionManager.DENY_ACTION ||
+          (fingerprintPermission !== Ci.nsIPermissionManager.ALLOW_ACTION &&
+            !Services.prefs.getBoolPref("vapor.privacy.fingerprinting.enabled", true))
+          ? SitePermissions.BLOCK
+          : SitePermissions.ALLOW,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
+
+      const clipboardPermission = lazy.VaporPrivacy.getSitePermission(
+        gBrowser.currentURI,
+        "vapor-clipboard",
+      );
+      permissions.push({
+        id: "vapor-clipboard",
+        state: clipboardPermission === Ci.nsIPermissionManager.ALLOW_ACTION &&
+          Services.prefs.getBoolPref("vapor.privacy.clipboard.enabled", true)
+          ? SitePermissions.ALLOW
+          : SitePermissions.BLOCK,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
+
+      const scriptPermission = lazy.VaporPrivacy.getSitePermission(
+        gBrowser.currentURI,
+        "vapor-script",
+      );
+      const scriptState = scriptPermission === Ci.nsIPermissionManager.ALLOW_ACTION
+        ? "allow-all"
+        : scriptPermission === Ci.nsIPermissionManager.DENY_ACTION
+          ? "block-all"
+          : lazy.VaporPrivacy.getScriptState(gBrowser.currentURI.host);
+      permissions.push({
+        id: "vapor-script",
+        state: scriptState === "block-all" ? SitePermissions.BLOCK : SitePermissions.ALLOW,
+        scriptState,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
     }
 
     // Add site protection permissions if needed.
@@ -742,6 +788,17 @@ export class nsZenSiteDataPanel {
         if (permission.id === "vapor-referrer") {
           return "zen-site-data-vapor-referrer-enabled";
         }
+        if (permission.id === "vapor-fingerprinting") {
+          return "zen-site-data-vapor-fingerprinting-enabled";
+        }
+        if (permission.id === "vapor-clipboard") {
+          return "zen-site-data-vapor-clipboard-enabled";
+        }
+        if (permission.id === "vapor-script") {
+          return permission.scriptState === "first-party"
+            ? "zen-site-data-vapor-script-first-party"
+            : "zen-site-data-vapor-script-enabled";
+        }
         return "zen-site-data-setting-allow";
       case SitePermissions.BLOCK:
       case SitePermissions.AUTOPLAY_BLOCKED_ALL:
@@ -759,6 +816,15 @@ export class nsZenSiteDataPanel {
         }
         if (permission.id === "vapor-referrer") {
           return "zen-site-data-vapor-referrer-disabled";
+        }
+        if (permission.id === "vapor-fingerprinting") {
+          return "zen-site-data-vapor-fingerprinting-disabled";
+        }
+        if (permission.id === "vapor-clipboard") {
+          return "zen-site-data-vapor-clipboard-disabled";
+        }
+        if (permission.id === "vapor-script") {
+          return "zen-site-data-vapor-script-disabled";
         }
         return "zen-site-data-setting-block";
       default:
@@ -829,6 +895,12 @@ export class nsZenSiteDataPanel {
         nameLabel,
         "zen-site-data-setting-vapor-referrer"
       );
+    } else if (id === "vapor-fingerprinting") {
+      this.document.l10n.setAttributes(nameLabel, "zen-site-data-setting-vapor-fingerprinting");
+    } else if (id === "vapor-clipboard") {
+      this.document.l10n.setAttributes(nameLabel, "zen-site-data-setting-vapor-clipboard");
+    } else if (id === "vapor-script") {
+      this.document.l10n.setAttributes(nameLabel, "zen-site-data-setting-vapor-script");
     } else {
       let label = SitePermissions.getPermissionLabel(permission.id);
       if (label) {
@@ -951,6 +1023,36 @@ export class nsZenSiteDataPanel {
         return;
     }
 
+    if (permission.id === "vapor-script") {
+      const states = ["allow-all", "first-party", "block-all"];
+      const current = permission.scriptState || "first-party";
+      const next = states[(states.indexOf(current) + 1) % states.length];
+      if (next === "first-party") {
+        lazy.VaporPrivacy.clearSitePermission(gBrowser.currentURI, permission.id);
+      } else {
+        lazy.VaporPrivacy.setSitePermission(
+          gBrowser.currentURI,
+          permission.id,
+          next === "allow-all",
+        );
+      }
+      lazy.VaporPrivacy.setScriptState(gBrowser.currentURI.host, next).then(() => {
+        gBrowser.reloadTab(gBrowser.selectedTab);
+      });
+      permission.scriptState = next;
+      permission.state = next === "block-all"
+        ? SitePermissions.BLOCK
+        : SitePermissions.ALLOW;
+      label.parentNode.setAttribute(
+        "state",
+        permission.state === SitePermissions.ALLOW ? "allow" : "block",
+      );
+      label
+        .querySelector(".zen-permission-popup-permission-state-label")
+        .setAttribute("data-l10n-id", this.#getPermissionStateLabelId(permission));
+      return;
+    }
+
     if (permission.id === "site-protection") {
       const { gProtectionsHandler } = this.window;
       if (newState === SitePermissions.BLOCK) {
@@ -970,13 +1072,18 @@ export class nsZenSiteDataPanel {
       );
     } else if (
       permission.id === "vapor-url-stripping" ||
-      permission.id === "vapor-referrer"
+      permission.id === "vapor-referrer" ||
+      permission.id === "vapor-fingerprinting" ||
+      permission.id === "vapor-clipboard"
     ) {
       lazy.VaporPrivacy.setSitePermission(
         gBrowser.currentURI,
         permission.id,
         newState === SitePermissions.ALLOW,
       );
+      if (permission.id === "vapor-fingerprinting" || permission.id === "vapor-clipboard") {
+        gBrowser.reloadTab(gBrowser.selectedTab);
+      }
     } else {
       SitePermissions.setForPrincipal(
         gBrowser.contentPrincipal,
