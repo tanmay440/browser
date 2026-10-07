@@ -140,7 +140,7 @@
 
 \- About page (`about:vapor`) shows version, build date, Gecko version, and tagline
 
-\- Custom icon: TBD (crosshair or dissolving element motif)
+\- Custom icon: Round 1 uses a placeholder crosshair; the final dissolving-element motif remains TBD
 
 \- User-agent string: reports as standard Firefox (for compatibility and fingerprinting uniformity), not "Vapor/1.0"
 
@@ -185,6 +185,22 @@
 \- No macOS-specific APIs, frameworks, or behaviors
 
 \- No Linux-specific APIs, package managers, or display server considerations
+
+
+
+\### 0.6 Round 1 implementation notes
+
+
+
+\- Vapor is forked from Zen Browser desktop commit `3585fef4f6a76723c00ab6571419c920eda65f4e` (the `dev` branch snapshot used for this Foundation round).
+
+\- The checked-in Zen source overlay is retained under the existing `src/zen` paths so inherited Zen features and patch tooling continue to build; those paths and internal `zen.*` preference/message identifiers are compatibility implementation details, not product branding.
+
+\- The Gecko base selected by `surfer.json` is Firefox `157.0.1`; the Vapor display version is `0.1.0-alpha`.
+
+\- Round 1 adds the Vapor branding configuration, placeholder crosshair assets, `about:vapor`, a gutted `about:telemetry` page, locked no-telemetry/no-Mozilla-service defaults, Firefox-compatible UA configuration, and automatic local profile-directory creation.
+
+\- No implementation from Sections 1–18 has been added. The inherited source still contains its upstream cross-platform build scaffolding, but the documented and supported Vapor target is Windows 10/11 x86\_64 only.
 
 
 

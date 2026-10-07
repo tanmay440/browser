@@ -1,0 +1,32 @@
+diff --git a/browser/branding/twilight/pref/firefox-branding.js b/browser/branding/twilight/pref/firefox-branding.js
+--- a/browser/branding/twilight/pref/firefox-branding.js
++++ b/browser/branding/twilight/pref/firefox-branding.js
+@@ -2,9 +2,9 @@
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+-pref("startup.homepage_override_url", "https://zen-browser.app/whatsnew?v=%VERSION%");
+-pref("startup.homepage_welcome_url", "https://zen-browser.app/welcome/");
+-pref("startup.homepage_welcome_url.additional", "https://zen-browser.app/privacy-policy/");
++pref("startup.homepage_override_url", "about:vapor");
++pref("startup.homepage_welcome_url", "about:vapor");
++pref("startup.homepage_welcome_url.additional", "");
+ 
+ // Give the user x seconds to react before showing the big UI. default=192 hours
+ pref("app.update.promptWaitTime", 691200);
+@@ -13,10 +13,10 @@
+ // app.update.url.details: a default value for the "More information about this
+ // update" link supplied in the "An update is available" page of the update
+ // wizard.
+-pref("app.update.url.manual", "https://zen-browser.app/download/");
+-pref("app.update.url.details", "https://zen-browser.app/release-notes/latest/");
+-pref("app.releaseNotesURL", "https://zen-browser.app/whatsnew/");
+-pref("app.releaseNotesURL.aboutDialog", "https://www.zen-browser.app/release-notes/%VERSION%/");
++pref("app.update.url.manual", "about:vapor");
++pref("app.update.url.details", "about:vapor");
++pref("app.releaseNotesURL", "about:vapor");
++pref("app.releaseNotesURL.aboutDialog", "about:vapor");
+-pref("app.releaseNotesURL.prompt", "https://zen-browser.app/release-notes/%VERSION%/");
++pref("app.releaseNotesURL.prompt", "about:vapor");
+ 
+ // Number of usages of the web console.

@@ -1,0 +1,78 @@
+diff --git a/browser/installer/windows/nsis/uninstaller.nsi b/browser/installer/windows/nsis/uninstaller.nsi
+--- a/browser/installer/windows/nsis/uninstaller.nsi
++++ b/browser/installer/windows/nsis/uninstaller.nsi
+@@ -150,7 +150,7 @@
+ !endif
+ ShowUnInstDetails nevershow
+ 
+-!define URLUninstallSurvey "https://qsurvey.mozilla.com/s3/FF-Desktop-Post-Uninstall?channel=${UpdateChannel}&version=${AppVersion}&osversion="
++!define URLUninstallSurvey ""
+ 
+ ; Support for the profile refresh feature
+ !define URLProfileRefreshHelp "https://support.mozilla.org/kb/refresh-firefox-reset-add-ons-and-settings"
+@@ -199,10 +199,6 @@
+ !insertmacro MUI_UNPAGE_INSTFILES
+ 
+ ; Finish Page
+-!define MUI_FINISHPAGE_SHOWREADME
+-!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+-!define MUI_FINISHPAGE_SHOWREADME_TEXT $(UN_SURVEY_CHECKBOX_LABEL)
+-!define MUI_FINISHPAGE_SHOWREADME_FUNCTION un.Survey
+ !define MUI_PAGE_CUSTOMFUNCTION_PRE un.preFinish
+ !define MUI_PAGE_CUSTOMFUNCTION_SHOW un.showFinish
+ !insertmacro MUI_UNPAGE_FINISH
+@@ -522,6 +518,7 @@
+   ${un.RegCleanFileHandler}  ".svg"   "FirefoxHTML-$AppUserModelID"
+   ${un.RegCleanFileHandler}  ".webp"  "FirefoxHTML-$AppUserModelID"
+   ${un.RegCleanFileHandler}  ".avif"  "FirefoxHTML-$AppUserModelID"
++  ${un.RegCleanFileHandler}  ".jxl"   "FirefoxHTML-$AppUserModelID"
+ 
+   ${un.RegCleanFileHandler}  ".pdf"   "FirefoxPDF-$AppUserModelID"
+ 
+@@ -994,13 +991,6 @@
+ FunctionEnd
+ 
+ Function un.onUninstSuccess
+-  ; Send a ping at un.onGUIEnd, to avoid freezing the GUI.
+-  StrCpy $ShouldSendPing "1"
+-
+-  ${If} ${Silent}
+-    ; If this is a silent uninstall then un.onGUIEnd doesn't run, so do it now.
+-    Call un.SendUninstallPing
+-  ${EndIf}
+ FunctionEnd
+ 
+ Function un.preFinish
+@@ -1120,31 +1110,4 @@
+ Function un.onGUIEnd
+   ${un.OnEndCommon}
+ 
+-  ${If} $ShouldOpenSurvey == "1"
+-    ; Though these values are sometimes incorrect due to bug 444664 it happens
+-    ; so rarely it isn't worth working around it by reading the registry values.
+-    ${WinVerGetMajor} $0
+-    ${WinVerGetMinor} $1
+-    ${WinVerGetBuild} $2
+-    ${WinVerGetServicePackLevel} $3
+-    StrCpy $R1 "${URLUninstallSurvey}$0.$1.$2.$3"
+-
+-    ; We can't just open the URL normally because we are most likely running
+-    ; elevated without an unelevated process to redirect through, and we're
+-    ; not going to go around starting elevated web browsers. But to start an
+-    ; unelevated process directly from here we need a pretty nasty hack; see
+-    ; the ExecInExplorer plugin code itself for the details.
+-    ; If we were the default browser and we've now been uninstalled, we need
+-    ; to take steps to make sure the user doesn't see an "open with" dialog;
+-    ; they're helping us out by answering this survey, they don't need more
+-    ; friction.
+-    ; Windows 10 always seems to just clear the default browser, so for it
+-    ; we'll manually invoke Edge using Edge's custom URI scheme.
+-    ExecInExplorer::Exec "microsoft-edge:$R1"
+-  ${EndIf}
+-
+-  ; Finally send the ping, there's no GUI to freeze in case it is slow.
+-  ${If} $ShouldSendPing == "1"
+-    Call un.SendUninstallPing
+-  ${EndIf}
+-FunctionEnd
++FunctionEnd

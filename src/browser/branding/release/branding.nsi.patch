@@ -1,0 +1,27 @@
+diff --git a/browser/branding/release/branding.nsi b/browser/branding/release/branding.nsi
+--- a/browser/branding/release/branding.nsi
++++ b/browser/branding/release/branding.nsi
+@@ -11,9 +11,9 @@
+ !define BrandFullNameInternal "Vapor Browser"
+ !define BrandFullName         "Vapor Browser"
+ !define CompanyName           "Vapor Browser Project"
+-!define URLInfoAbout          "https://zen-browser.app"
+-!define URLUpdateInfo         "https://zen-browser.app/release-notes/\${AppVersion}"
+-!define HelpLink              "https://github.com/zen-browser/desktop/issues"
++!define URLInfoAbout          "about:vapor"
++!define URLUpdateInfo         "about:vapor"
++!define HelpLink              "about:vapor"
+ 
+ 
+ ; The OFFICIAL define is a workaround to support different urls for Release and
+@@ -23,8 +23,8 @@
+ !define URLStubDownloadX86 "https://download.mozilla.org/?os=win&lang=\${AB_CD}&product=firefox-latest"
+ !define URLStubDownloadAMD64 "https://download.mozilla.org/?os=win64&lang=\${AB_CD}&product=firefox-latest"
+ !define URLStubDownloadAArch64 "https://download.mozilla.org/?os=win64-aarch64&lang=\${AB_CD}&product=firefox-latest"
+-!define URLManualDownload "https://zen-browser.app/download"
+-!define URLSystemRequirements "https://www.mozilla.org/firefox/system-requirements/"
++!define URLManualDownload "about:vapor"
++!define URLSystemRequirements "about:vapor"
+ !define Channel "stable"
+ 
+ # The installer's certificate name and issuer expected by the stub installer
