@@ -1,0 +1,76 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<html:template id="template-paneVaporCookies">
+  <hbox class="subcategory" data-category="paneVaporCookies"><html:h1 value="Cookies"/></hbox>
+  <groupbox id="vaporRound11CookiesGroup" data-category="paneVaporCookies" class="highlighting-group">
+    <label><html:h2 value="Cookies"/></label>
+    <description value="Broom deletes site data when you leave, with remembered-site exceptions."/>
+    <checkbox id="vaporRound11BroomEnabled" preference="vapor.broom.enabled" label="Enable Broom automatic cleanup"/>
+    <checkbox id="vaporRound11BroomToast" preference="vapor.broom.toast" label="Show cleanup notifications"/>
+    <checkbox id="vaporRound11BroomLogin" preference="vapor.broom.login-detection" label="Protect login sessions"/>
+    <hbox align="center"><label control="vaporRound11BroomMode" value="Deletion mode"/><menulist id="vaporRound11BroomMode" preference="vapor.broom.mode"><menupopup><menuitem value="full" label="Cookies and storage"/><menuitem value="cookies-only" label="Cookies only"/><menuitem value="trackers-only" label="Trackers only"/><menuitem value="keep-all" label="Keep all"/></menupopup></menulist></hbox>
+    <hbox align="center"><label control="vaporRound11BroomDelay" value="Cleanup delay (ms)"/><textbox id="vaporRound11BroomDelay" preference="vapor.broom.delay-ms" type="number"/></hbox>
+    <checkbox id="vaporRound11ReflexEnabled" preference="vapor.reflex.enabled" label="Enable Reflex consent handling"/>
+    <checkbox id="vaporRound11ReflexPreConsent" preference="vapor.reflex.pre-consent" label="Delete tracking cookies before consent"/>
+    <button label="Edit remembered sites and consent phrases in Privacy" oncommand="gVaporPrivacySettings.init(); openPreferences('panePrivacy');"/>
+  </groupbox>
+</html:template>
+
+<html:template id="template-paneVaporRouting">
+  <hbox class="subcategory" data-category="paneVaporRouting"><html:h1 value="Routing"/></hbox>
+  <groupbox id="vaporRound11RoutingGroup" data-category="paneVaporRouting" class="highlighting-group">
+    <label><html:h2 value="Routing"/></label>
+    <description value="Keep Tor, Scramjet, and OpenVPN settings independent per tab."/>
+    <hbox align="center"><label control="vaporRound11DefaultRoute" value="Default tab type"/><menulist id="vaporRound11DefaultRoute" preference="vapor.routing.default-tab-type"><menupopup><menuitem value="regular" label="Regular"/><menuitem value="tor" label="Tor"/><menuitem value="scramjet" label="Scramjet"/></menupopup></menulist></hbox>
+    <checkbox id="vaporRound11TorKillSwitch" preference="vapor.routing.tor.kill-on-last-tab" label="Stop Tor when the last Tor tab closes"/>
+    <hbox align="center"><label control="vaporRound11ScramjetProxy" value="Scramjet proxy URL"/><html:input id="vaporRound11ScramjetProxy" preference="vapor.routing.scramjet.proxy"/></hbox>
+    <hbox align="center"><label control="vaporRound11ScramjetTemplate" value="Scramjet URL template"/><html:input id="vaporRound11ScramjetTemplate" preference="vapor.routing.scramjet.url-template"/></hbox>
+    <hbox align="center"><label control="vaporRound11VPNBinary" value="OpenVPN binary"/><html:input id="vaporRound11VPNBinary" preference="vapor.routing.openvpn.binary"/></hbox>
+    <hbox align="center"><label control="vaporRound11VPNProfile" value="OpenVPN profile"/><html:input id="vaporRound11VPNProfile" preference="vapor.routing.openvpn.profile"/></hbox>
+    <checkbox id="vaporRound11VPNAuto" preference="vapor.routing.openvpn.auto-connect" label="Connect OpenVPN at startup"/>
+    <checkbox id="vaporRound11VPNWarn" preference="vapor.routing.openvpn.warn-disconnected" label="Warn when VPN is disconnected"/>
+  </groupbox>
+</html:template>
+
+<html:template id="template-paneVaporWorkspaces">
+  <hbox class="subcategory" data-category="paneVaporWorkspaces"><html:h1 value="Workspaces"/></hbox>
+  <groupbox id="vaporRound11WorkspacesGroup" data-category="paneVaporWorkspaces" class="highlighting-group">
+    <label><html:h2 value="Workspaces"/></label>
+    <description value="Workspace templates and workspace-specific overrides."/>
+    <checkbox id="vaporRound11WorkspaceContainers" preference="zen.workspaces.force-container-workspace" label="Use a dedicated container for each workspace"/>
+    <checkbox id="vaporRound11WorkspaceEssentials" preference="zen.workspaces.separate-essentials" label="Keep essentials separate per workspace"/>
+    <checkbox id="vaporRound11WorkspaceContinue" preference="zen.workspaces.continue-where-left-off" label="Continue where each workspace left off"/>
+    <label value="For template management, use the Templates section on the existing Workspaces page."/>
+  </groupbox>
+</html:template>
+
+<html:template id="template-paneVaporTabs">
+  <hbox class="subcategory" data-category="paneVaporTabs"><html:h1 value="Tabs"/></hbox>
+  <groupbox id="vaporRound11TabsGroup" data-category="paneVaporTabs" class="highlighting-group">
+    <label><html:h2 value="Tabs"/></label>
+    <description value="Control hibernation, tab cycling, and global pins."/>
+    <hbox align="center"><label control="vaporRound11Hibernation" value="Hibernate inactive tabs after (minutes)"/><textbox id="vaporRound11Hibernation" preference="vapor.tabs.hibernation-timeout-minutes" type="number"/></hbox>
+    <checkbox id="vaporRound11IgnorePending" preference="zen.tabs.ctrl-tab.ignore-pending-tabs" label="Ignore pending tabs when cycling"/>
+    <checkbox id="vaporRound11IgnoreEssential" preference="zen.tabs.ctrl-tab.ignore-essential-tabs" label="Ignore essential tabs when cycling"/>
+    <checkbox id="vaporRound11RecentClose" preference="zen.tabs.select-recently-used-on-close" label="Select the most recently used tab after closing"/>
+    <checkbox id="vaporRound11RestorePins" preference="browser.sessionstore.restore_pinned_tabs_on_demand" label="Restore pinned tabs on demand"/>
+  </groupbox>
+</html:template>
+
+<html:template id="template-paneVaporSound">
+  <hbox class="subcategory" data-category="paneVaporSound"><html:h1 value="Sound"/></hbox>
+  <groupbox id="vaporSoundSettingsGroup" data-category="paneVaporSound" class="highlighting-group">
+    <label><html:h2 value="Sound Effects"/></label>
+    <description value="All sounds are synthesized locally and disabled by default only when you turn them off."/>
+    <hbox align="center"><label control="vaporSoundMasterVolume" value="Master volume"/><scale id="vaporSoundMasterVolume" min="0" max="100" preference="vapor.sound.master-volume"/><label value="%"/></hbox>
+    <checkbox id="vaporSoundLaser" preference="vapor.sound.laser" label="Laser zap — crisp pew"/>
+    <checkbox id="vaporSoundShield" preference="vapor.sound.shield" label="Shield Breaker — crack-shatter"/>
+    <checkbox id="vaporSoundTabClose" preference="vapor.sound.tabClose" label="Tab close — soft whoosh"/>
+    <checkbox id="vaporSoundWorkspace" preference="vapor.sound.workspace" label="Workspace switch — subtle click"/>
+    <checkbox id="vaporSoundTor" preference="vapor.sound.tor" label="Tor tab open — low hum"/>
+    <checkbox id="vaporSoundKillSwitch" preference="vapor.sound.killSwitch" label="Kill switch — alarm blip"/>
+    <checkbox id="vaporSoundMilestone" preference="vapor.sound.milestone" label="Adblocker milestone — tiny ding"/>
+  </groupbox>
+</html:template>

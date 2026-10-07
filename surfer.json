@@ -1,0 +1,52 @@
+{
+  "name": "Vapor Browser",
+  "vendor": "Vapor Browser Project",
+  "appId": "vapor",
+  "binaryName": "vapor",
+  "version": {
+    "product": "firefox",
+    "version": "157.0.1",
+    "candidate": "157.0.1",
+    "candidateBuild": 1
+  },
+  "buildOptions": {
+    "generateBranding": true
+  },
+  "addons": {},
+  "brands": {
+    "release": {
+      "backgroundColor": "#282A33",
+      "brandShorterName": "Vapor",
+      "brandShortName": "Vapor",
+      "brandFullName": "Vapor Browser",
+      "release": {
+        "displayVersion": "0.1.0-alpha",
+        "github": {
+          "repo": "tanmay440/browser"
+        },
+        "archives": {
+          "windows": "windows.mar"
+        }
+      }
+    },
+    "twilight": {
+      "backgroundColor": "#282A33",
+      "brandShorterName": "Vapor",
+      "brandShortName": "Vapor",
+      "brandFullName": "Vapor Browser",
+      "release": {
+        "displayVersion": "0.1.0-alpha",
+        "github": {
+          "repo": "tanmay440/browser"
+        }
+      }
+    }
+  },
+  "license": {
+    "ignoredFiles": [
+      ".*\\.json"
+    ],
+    "licenseType": "MPL-2.0"
+  },
+  "updateHostname": "updates.vapor.browser"
+}

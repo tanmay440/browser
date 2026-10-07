@@ -1,0 +1,151 @@
+# Vapor Filter and Shield Breaker Round 4 preferences.
+- name: vapor.filter.enabled
+  value: true
+
+# Vapor Shield Round 2 preferences.
+# The global switch is user-controlled; the network interceptor consumes these
+# values in the parent process. DNS prefetch is disabled so blocked hosts are not
+# resolved speculatively before the request matcher sees them.
+- name: vapor.shield.enabled
+  value: true
+
+- name: vapor.shield.block-consent-popups
+  value: true
+
+- name: vapor.shield.block-crypto-miners
+  value: true
+
+- name: network.dns.disablePrefetch
+  value: true
+  locked: true
+
+- name: network.predictor.enabled
+  value: false
+  locked: true
+
+- name: network.predictor.enable-prefetch
+  value: false
+  locked: true
+
+# Vapor Round 5 network privacy. HTTPS-only has no global off switch; HTTP
+# exceptions are stored per profile and are granted only after confirmation.
+- name: vapor.privacy.url-stripping.enabled
+  value: true
+
+- name: vapor.privacy.cname-uncloaking.enabled
+  value: true
+
+- name: vapor.privacy.referrer-policy
+  value: strict-origin-when-cross-origin
+
+- name: vapor.privacy.doh.enabled
+  value: true
+
+- name: vapor.privacy.doh.resolver
+  value: mullvad
+
+- name: vapor.privacy.speculative-loading.enabled
+  value: true
+
+# Vapor Round 6 browser privacy defaults.
+- name: vapor.privacy.fingerprinting.enabled
+  value: true
+
+- name: vapor.privacy.fingerprinting.extended
+  value: true
+
+- name: vapor.privacy.fingerprinting.timezone
+  value: UTC
+
+- name: vapor.privacy.fingerprinting.language
+  value: en-US
+
+- name: vapor.privacy.clipboard.enabled
+  value: true
+
+- name: vapor.privacy.script-blocking.enabled
+  value: true
+
+- name: vapor.privacy.script-blocking.default-state
+  value: first-party
+
+# Vapor Round 7 storage privacy.
+- name: vapor.broom.enabled
+  value: true
+
+- name: vapor.broom.mode
+  value: full
+
+- name: vapor.broom.delay-ms
+  value: 2000
+
+- name: vapor.broom.toast
+  value: false
+
+- name: vapor.broom.login-detection
+  value: true
+
+- name: vapor.reflex.enabled
+  value: true
+
+- name: vapor.reflex.mode
+  value: aggressive
+
+- name: vapor.reflex.pre-consent
+  value: true
+
+- name: vapor.reflex.languages
+  value: en,de,fr,es,it,nl,pt,pl
+
+- name: vapor.reflex.cmp-api
+  value: true
+
+- name: vapor.reflex.failure-notifications
+  value: true
+
+- name: network.trr.mode
+  value: 3
+
+- name: network.trr.wait-for-portal
+  value: false
+
+- name: network.http.referrer.defaultPolicy
+  value: 2
+  locked: true
+
+- name: network.http.referrer.defaultPolicy.pbmode
+  value: 2
+  locked: true
+
+- name: network.prefetch-next
+  value: false
+  locked: true
+
+# Vapor Round 8 tab routing and OpenVPN launcher.
+- name: vapor.routing.default-tab-type
+  value: regular
+
+- name: vapor.routing.scramjet.proxy
+  value: ""
+
+- name: vapor.routing.scramjet.url-template
+  value: ""
+
+- name: vapor.routing.openvpn.binary
+  value: ""
+
+- name: vapor.routing.openvpn.profile
+  value: default.ovpn
+
+- name: vapor.routing.openvpn.auto-connect
+  value: false
+
+- name: vapor.routing.openvpn.warn-disconnected
+  value: false
+
+- name: vapor.routing.tor.kill-on-last-tab
+  value: true
+
+
+- name: vapor.tabs.hibernation-timeout-minutes
+  value: 15

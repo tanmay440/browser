@@ -1,0 +1,132 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<html:template id="template-paneZenTabManagement">
+<hbox id="ZenWorkspacesCategory"
+      class="subcategory"
+      hidden="true"
+      data-category="paneZenTabManagement">
+</hbox>
+
+<hbox id="zenTabManagementCategory"
+      class="subcategory"
+      hidden="true"
+      data-category="paneZenTabManagement">
+<html:h1 data-l10n-id="pane-settings-workspaces-title"/>
+</hbox>
+
+<groupbox id="zenWorkspacesGroup" data-category="paneZenTabManagement" hidden="true" class="highlighting-group">
+      <label><html:h2 data-l10n-id="zen-settings-workspaces-header"/></label>
+      <description class="description-deemphasized" data-l10n-id="zen-settings-workspaces-description" />
+
+      <checkbox id="zenWorkspacesSyncUnpinnedTabs"
+            data-l10n-id="zen-settings-workspaces-sync-unpinned-tabs"
+            preference="zen.window-sync.sync-only-pinned-tabs"/>
+      <checkbox id="zenWorkspacesHideDefaultContainer"
+            data-l10n-id="zen-settings-workspaces-hide-default-container-indicator"
+            preference="zen.workspaces.hide-default-container-indicator"/>
+      <checkbox id="zenWorkspacesForceContainerTabsToWorkspace"
+            data-l10n-id="zen-settings-workspaces-force-container-tabs-to-workspace"
+            preference="zen.workspaces.force-container-workspace"/>
+      <checkbox id="zenTabsCloseOnBackWithNoHistory"
+            data-l10n-id="zen-tabs-close-on-back-with-no-history"
+            preference="zen.tabs.close-on-back-with-no-history"/>
+      <checkbox data-l10n-id="zen-tabs-cycle-ignore-pending-tabs"
+            preference="zen.tabs.ctrl-tab.ignore-pending-tabs"/>
+      <checkbox data-l10n-id="zen-tabs-cycle-by-attribute"
+            preference="zen.tabs.ctrl-tab.ignore-essential-tabs"/>
+      <description id="zenTabsCycleByAttributeWarning"
+            class="description-deemphasized"
+            data-l10n-id="zen-tabs-cycle-by-attribute-warning"
+            hidden="true"/>
+      <checkbox data-l10n-id="zen-tabs-select-recently-used-on-close"
+            preference="zen.tabs.select-recently-used-on-close"/>
+</groupbox>
+
+<hbox id="zenPinnedTabsManagerCategory"
+      class="subcategory"
+      hidden="true"
+      data-category="paneZenTabManagement">
+      <html:h1 data-l10n-id="pane-zen-pinned-tab-manager-title"/>
+</hbox>
+
+<groupbox id="zenPinnedTabsManagerGroup" data-category="paneZenTabManagement" hidden="true" class="highlighting-group">
+      <label><html:h2 data-l10n-id="zen-pinned-tab-manager-header"/></label>
+      <description class="description-deemphasized" data-l10n-id="zen-pinned-tab-manager-description" />
+
+      <checkbox id="zenPinnedTabRestorePinnedTabsToPinnedUrl"
+                data-l10n-id="zen-pinned-tab-manager-restore-pinned-tabs-to-pinned-url"
+                preference="zen.pinned-tab-manager.restore-pinned-tabs-to-pinned-url"/>
+      <checkbox id="zenPinnedTabContainerSpecificEssentials"
+                data-l10n-id="zen-pinned-tab-manager-container-specific-essentials-enabled"
+                preference="zen.workspaces.separate-essentials"/>
+
+      <hbox align="center">
+            <label id="zenPinnedTabCloseShortcutBehaviorLabel" data-l10n-id="zen-pinned-tab-manager-close-shortcut-behavior-label"/>
+            <menulist id="zenPinnedTabCloseShortcutBehavior" preference="zen.pinned-tab-manager.close-shortcut-behavior">
+                  <menupopup>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-reset-unload-switch-close-shortcut-option" value="reset-unload-switch"/>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-unload-switch-close-shortcut-option" value="unload-switch"/>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-reset-switch-close-shortcut-option" value="reset-switch"/>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-switch-close-shortcut-option" value="switch"/>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-reset-close-shortcut-option" value="reset"/>
+                        <menuitem data-l10n-id="zen-pinned-tab-manager-close-close-shortcut-option" value="close"/>
+                  </menupopup>
+            </menulist>
+      </hbox>
+</groupbox>
+
+<groupbox id="vaporWorkspaceTemplatesGroup" data-category="paneZenTabManagement" hidden="true" class="highlighting-group">
+      <label><html:h2 data-l10n-id="vapor-workspace-templates-header"/></label>
+      <description class="description-deemphasized" data-l10n-id="vapor-workspace-templates-description" />
+      <hbox align="center">
+            <richlistbox id="vaporWorkspaceTemplatesList" flex="1" rows="5" seltype="single"/>
+            <vbox>
+                  <button id="vaporTemplateCreateFromCurrent" data-l10n-id="vapor-workspace-template-create-current"/>
+                  <button id="vaporTemplateImport" data-l10n-id="vapor-workspace-template-import"/>
+                  <button id="vaporTemplateExport" data-l10n-id="vapor-workspace-template-export"/>
+                  <button id="vaporTemplateApplyExisting" data-l10n-id="vapor-workspace-template-apply-existing"/>
+                  <button id="vaporTemplateApplyNew" data-l10n-id="vapor-workspace-template-apply-new"/>
+            </vbox>
+      </hbox>
+      <grid id="vaporWorkspaceTemplateFormGrid">
+            <columns><column/><column flex="1"/></columns>
+            <rows>
+                  <row><label control="vaporTemplateName" data-l10n-id="vapor-workspace-template-name"/><textbox id="vaporTemplateName"/></row>
+                  <row><label control="vaporTemplateDescription" data-l10n-id="vapor-workspace-template-description-field"/><textbox id="vaporTemplateDescription"/></row>
+                  <row><label control="vaporTemplateIcon" data-l10n-id="vapor-workspace-template-icon"/><textbox id="vaporTemplateIcon"/></row>
+                  <row><label control="vaporTemplateColor" data-l10n-id="vapor-workspace-template-color"/><textbox id="vaporTemplateColor"/></row>
+                  <row><label control="vaporTemplateType" data-l10n-id="vapor-workspace-template-default-type"/><menulist id="vaporTemplateType"><menupopup><menuitem value="regular" label="Regular"/><menuitem value="tor" label="Tor"/><menuitem value="scramjet" label="Scramjet"/></menupopup></menulist></row>
+                  <row><label control="vaporTemplateURL" data-l10n-id="vapor-workspace-template-default-url"/><textbox id="vaporTemplateURL"/></row>
+                  <row><label control="vaporTemplateSearchName" data-l10n-id="vapor-workspace-template-search-name"/><textbox id="vaporTemplateSearchName"/></row>
+                  <row><label control="vaporTemplateSearchURL" data-l10n-id="vapor-workspace-template-search-url"/><textbox id="vaporTemplateSearchURL"/></row>
+                  <row><label control="vaporTemplateSuggestURL" data-l10n-id="vapor-workspace-template-suggest-url"/><textbox id="vaporTemplateSuggestURL"/></row>
+                  <row><label control="vaporTemplateScriptMode" data-l10n-id="vapor-workspace-template-script-mode"/><menulist id="vaporTemplateScriptMode"><menupopup><menuitem value="allow-all" label="Allow all"/><menuitem value="first-party-only" label="First-party only"/><menuitem value="block-all" label="Block all"/></menupopup></menulist></row>
+                  <row><label control="vaporTemplateHibernation" data-l10n-id="vapor-workspace-template-hibernation"/><textbox id="vaporTemplateHibernation" type="number"/></row>
+                  <row><label control="vaporTemplateHomepage" data-l10n-id="vapor-workspace-template-homepage"/><textbox id="vaporTemplateHomepage"/></row>
+                  <row><label control="vaporTemplatePinned" data-l10n-id="vapor-workspace-template-pinned-tabs"/><textbox id="vaporTemplatePinned" multiline="true" rows="3"/></row>
+                  <row><label control="vaporTemplateRemembered" data-l10n-id="vapor-workspace-template-remembered-sites"/><textbox id="vaporTemplateRemembered" multiline="true" rows="3"/></row>
+                  <row><label control="vaporTemplateRememberedScope" data-l10n-id="vapor-workspace-template-remembered-scope"/><menulist id="vaporTemplateRememberedScope"><menupopup><menuitem value="global" label="Global"/><menuitem value="workspace" label="This workspace"/></menupopup></menulist></row>
+            </rows>
+      </grid>
+      <hbox>
+            <checkbox id="vaporTemplateAdblock" data-l10n-id="vapor-workspace-template-adblock"/>
+            <checkbox id="vaporTemplateURLStrip" data-l10n-id="vapor-workspace-template-url-strip"/>
+            <checkbox id="vaporTemplateCNAME" data-l10n-id="vapor-workspace-template-cname"/>
+            <checkbox id="vaporTemplateVPN" data-l10n-id="vapor-workspace-template-vpn"/>
+      </hbox>
+      <hbox>
+            <button id="vaporTemplateSave" data-l10n-id="vapor-workspace-template-save"/>
+            <button id="vaporTemplateEditJSON" data-l10n-id="vapor-workspace-template-edit-json"/>
+      </hbox>
+      <textbox id="vaporTemplateJSON" multiline="true" rows="12" hidden="true"/>
+      <hbox>
+            <button id="vaporSnapshotSave" data-l10n-id="vapor-workspace-snapshot-save"/>
+            <button id="vaporSnapshotRestore" data-l10n-id="vapor-workspace-snapshot-restore"/>
+      </hbox>
+</groupbox>
+
+</html:template>
+
+

@@ -1,0 +1,80 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+:root {
+  color-scheme: light dark;
+  --bg: #15161c;
+  --card: #242631;
+  --text: #f4f5f7;
+  --muted: #a8adba;
+  --accent: #f76f53;
+}
+
+@media (prefers-color-scheme: light) {
+  :root { --bg: #f4f5f7; --card: #fff; --text: #20222b; --muted: #5d6270; }
+}
+
+* { box-sizing: border-box; }
+body {
+  align-items: center;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  font: message-box;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  padding: 32px;
+}
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 18px 55px rgb(0 0 0 / 25%);
+  max-width: 560px;
+  padding: 42px 48px;
+  text-align: center;
+  width: 100%;
+}
+.mark { height: 88px; margin: 0 auto 16px; width: 88px; }
+.mark svg { fill: none; height: 100%; stroke: var(--accent); stroke-linecap: round; stroke-width: 7; width: 100%; }
+h1 { font-size: 32px; margin: 0 0 8px; }
+.tagline { color: var(--muted); font-size: 17px; margin: 0 0 32px; }
+dl { margin: 0 auto 28px; max-width: 360px; }
+dl div { border-bottom: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); display: flex; justify-content: space-between; padding: 10px 0; }
+dt { color: var(--muted); }
+dd { font-variant-numeric: tabular-nums; margin: 0; }
+.foundation { color: var(--muted); font-size: 13px; margin: 0; }
+.activity { border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); margin-top: 28px; padding-top: 22px; text-align: left; }
+.activity h2 { font-size: 19px; margin: 0 0 5px; }
+.activity p { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+.activity ol { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0; max-height: 220px; overflow: auto; padding-left: 22px; }
+.activity strong { color: var(--text); }
+.telemetry p { line-height: 1.55; }
+
+.dashboard {
+  max-width: 1180px;
+  padding: 34px 42px;
+  text-align: left;
+}
+.dashboard .mark, .dashboard > h1, .dashboard > .tagline { text-align: center; }
+.dashboard > .mark { margin-inline: auto; }
+.dashboard > h1, .dashboard > .tagline { display: block; }
+.dashboard .build-info { max-width: 620px; }
+.stats-section { border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); margin-top: 24px; padding-top: 18px; }
+.stats-section h2 { font-size: 19px; margin: 0 0 10px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.stats-grid > div { background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 10px; padding: 14px; }
+.stats-grid strong { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
+.stats-grid span { color: var(--muted); font-size: 12px; }
+.activity-chart { align-items: end; display: flex; gap: 3px; height: 120px; padding: 8px 0; }
+.activity-chart span { background: var(--accent); border-radius: 3px 3px 0 0; flex: 1; min-width: 4px; opacity: .85; }
+.split-section { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.stats-section ol, .stats-section ul { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0; max-height: 210px; overflow: auto; padding-left: 22px; }
+.stats-section li strong { color: var(--text); }
+.stats-section p { color: var(--muted); }
+#vapor-dashboard.vapor-reassembling { animation: vapor-reassemble 3s ease-out both; }
+#vapor-dashboard.vapor-dissolve { animation: vapor-dissolve .35s ease-in forwards; }
+@keyframes vapor-dissolve { to { opacity: 0; filter: blur(12px); transform: scale(.97); } }
+@keyframes vapor-reassemble { from { opacity: 0; filter: blur(8px); transform: translateY(8px); } to { opacity: 1; filter: none; transform: none; } }
+@media (max-width: 760px) { .stats-grid, .split-section { grid-template-columns: 1fr 1fr; } .dashboard { padding: 24px; } }

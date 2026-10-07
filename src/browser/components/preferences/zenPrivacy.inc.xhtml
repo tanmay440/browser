@@ -1,0 +1,215 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<groupbox id="vaporPrivacyGroup"
+          data-category="panePrivacy"
+          class="highlighting-group">
+  <label><html:h2 data-l10n-id="vapor-privacy-settings-header"/></label>
+  <description class="description-deemphasized"
+               data-l10n-id="vapor-privacy-settings-description" />
+
+  <checkbox id="vaporPrivacyURLStripping"
+            preference="vapor.privacy.url-stripping.enabled"
+            data-l10n-id="vapor-privacy-url-stripping" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-url-list" />
+    <spacer flex="1" />
+    <button id="vaporPrivacyURLStripSave"
+            data-l10n-id="vapor-privacy-url-list-save" />
+  </hbox>
+  <html:textarea id="vaporPrivacyURLStripRules"
+                 rows="8"
+                 aria-label="URL stripping list" />
+
+  <checkbox id="vaporPrivacyCNAME"
+            preference="vapor.privacy.cname-uncloaking.enabled"
+            data-l10n-id="vapor-privacy-cname" />
+
+  <hbox align="center">
+    <label for="vaporPrivacyReferrerPolicy"
+           data-l10n-id="vapor-privacy-referrer-policy" />
+    <menulist id="vaporPrivacyReferrerPolicy"
+              preference="vapor.privacy.referrer-policy">
+      <menupopup>
+        <menuitem value="strict-origin-when-cross-origin"
+                  data-l10n-id="vapor-privacy-referrer-strict" />
+        <menuitem value="strict-origin"
+                  data-l10n-id="vapor-privacy-referrer-origin" />
+        <menuitem value="off"
+                  data-l10n-id="vapor-privacy-referrer-off" />
+      </menupopup>
+    </menulist>
+  </hbox>
+
+  <checkbox id="vaporPrivacyDohEnabled"
+            preference="vapor.privacy.doh.enabled"
+            data-l10n-id="vapor-privacy-doh" />
+  <hbox align="center">
+    <label for="vaporPrivacyDohResolver"
+           data-l10n-id="vapor-privacy-doh-resolver" />
+    <menulist id="vaporPrivacyDohResolver"
+              preference="vapor.privacy.doh.resolver">
+      <menupopup>
+        <menuitem value="mullvad" label="Mullvad DNS" />
+        <menuitem value="quad9" label="Quad9" />
+        <menuitem value="nextdns" label="NextDNS" />
+      </menupopup>
+    </menulist>
+    <label id="vaporPrivacyDohStatus" class="description-deemphasized" />
+  </hbox>
+
+  <checkbox id="vaporPrivacySpeculative"
+            preference="vapor.privacy.speculative-loading.enabled"
+            data-l10n-id="vapor-privacy-speculative" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-fingerprinting-header"/></label>
+  <checkbox id="vaporPrivacyFingerprinting"
+            preference="vapor.privacy.fingerprinting.enabled"
+            data-l10n-id="vapor-privacy-fingerprinting" />
+  <checkbox id="vaporPrivacyExtendedFingerprinting"
+            preference="vapor.privacy.fingerprinting.extended"
+            data-l10n-id="vapor-privacy-fingerprinting-extended" />
+  <hbox align="center">
+    <label for="vaporPrivacyTimezone" data-l10n-id="vapor-privacy-timezone" />
+    <menulist id="vaporPrivacyTimezone" preference="vapor.privacy.fingerprinting.timezone">
+      <menupopup><menuitem value="UTC" label="UTC" /></menupopup>
+    </menulist>
+    <label for="vaporPrivacyLanguage" data-l10n-id="vapor-privacy-language" />
+    <menulist id="vaporPrivacyLanguage" preference="vapor.privacy.fingerprinting.language">
+      <menupopup><menuitem value="en-US" label="English (US)" /></menupopup>
+    </menulist>
+  </hbox>
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-clipboard-header"/></label>
+  <checkbox id="vaporPrivacyClipboard"
+            preference="vapor.privacy.clipboard.enabled"
+            data-l10n-id="vapor-privacy-clipboard" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-user-agent-header"/></label>
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-user-agent-list" />
+    <spacer flex="1" />
+    <button id="vaporPrivacyUAOverridesSave" data-l10n-id="vapor-privacy-user-agent-save" />
+  </hbox>
+  <html:textarea id="vaporPrivacyUAOverrides" rows="5" aria-label="User-Agent overrides" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-privacy-script-header"/></label>
+  <checkbox id="vaporPrivacyScriptBlocking"
+            preference="vapor.privacy.script-blocking.enabled"
+            data-l10n-id="vapor-privacy-script-blocking" />
+  <description class="description-deemphasized" data-l10n-id="vapor-privacy-script-help" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-broom-settings-header"/></label>
+  <checkbox id="vaporBroomEnabled" preference="vapor.broom.enabled" data-l10n-id="vapor-broom-enabled" />
+  <hbox align="center">
+    <label for="vaporBroomMode" data-l10n-id="vapor-broom-mode" />
+    <menulist id="vaporBroomMode" preference="vapor.broom.mode">
+      <menupopup>
+        <menuitem value="full" data-l10n-id="vapor-broom-mode-full" />
+        <menuitem value="cookies-only" data-l10n-id="vapor-broom-mode-cookies" />
+        <menuitem value="trackers-only" data-l10n-id="vapor-broom-mode-trackers" />
+        <menuitem value="keep-all" data-l10n-id="vapor-broom-mode-keep" />
+      </menupopup>
+    </menulist>
+    <label for="vaporBroomDelay" data-l10n-id="vapor-broom-delay" />
+    <menulist id="vaporBroomDelay" preference="vapor.broom.delay-ms">
+      <menupopup>
+        <menuitem value="0" label="0s" />
+        <menuitem value="2000" label="2s" />
+        <menuitem value="5000" label="5s" />
+        <menuitem value="10000" label="10s" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <checkbox id="vaporBroomToast" preference="vapor.broom.toast" data-l10n-id="vapor-broom-toast" />
+  <checkbox id="vaporBroomLoginDetection" preference="vapor.broom.login-detection" data-l10n-id="vapor-broom-login-detection" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-broom-remembered-sites" />
+    <spacer flex="1" />
+    <button id="vaporBroomRememberedSave" data-l10n-id="vapor-broom-save" />
+  </hbox>
+  <html:textarea id="vaporBroomRememberedSites" rows="5" aria-label="Remembered sites" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-reflex-settings-header"/></label>
+  <checkbox id="vaporReflexEnabled" preference="vapor.reflex.enabled" data-l10n-id="vapor-reflex-enabled" />
+  <hbox align="center">
+    <label for="vaporReflexMode" data-l10n-id="vapor-reflex-mode" />
+    <menulist id="vaporReflexMode" preference="vapor.reflex.mode">
+      <menupopup>
+        <menuitem value="aggressive" data-l10n-id="vapor-reflex-mode-aggressive" />
+        <menuitem value="polite" data-l10n-id="vapor-reflex-mode-polite" />
+        <menuitem value="manual" data-l10n-id="vapor-reflex-mode-manual" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <checkbox id="vaporReflexPreConsent" preference="vapor.reflex.pre-consent" data-l10n-id="vapor-reflex-pre-consent" />
+  <checkbox id="vaporReflexCMPAPI" preference="vapor.reflex.cmp-api" data-l10n-id="vapor-reflex-cmp-api" />
+  <checkbox id="vaporReflexFailureNotifications" preference="vapor.reflex.failure-notifications" data-l10n-id="vapor-reflex-failure-notifications" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-reflex-languages" />
+    <spacer flex="1" />
+  </hbox>
+  <html:input id="vaporReflexLanguages" preference="vapor.reflex.languages" aria-label="Consent languages" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-reflex-phrases" />
+    <spacer flex="1" />
+    <button id="vaporReflexPhrasesSave" data-l10n-id="vapor-reflex-save" />
+  </hbox>
+  <html:textarea id="vaporReflexPhrases" rows="8" aria-label="Consent phrases JSON" />
+
+  <hbox align="center">
+    <label data-l10n-id="vapor-privacy-https-exceptions" />
+    <spacer flex="1" />
+    <button id="vaporHTTPSExceptionsSave"
+            data-l10n-id="vapor-privacy-https-exceptions-save" />
+  </hbox>
+  <html:textarea id="vaporHTTPSExceptions"
+                 rows="5"
+                 aria-label="HTTPS-only exceptions" />
+
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-routing-settings-header" /></label>
+  <description class="description-deemphasized" data-l10n-id="vapor-routing-settings-description" />
+  <hbox align="center">
+    <label for="vaporRoutingDefaultTabType" data-l10n-id="vapor-routing-default-tab-type" />
+    <menulist id="vaporRoutingDefaultTabType" preference="vapor.routing.default-tab-type">
+      <menupopup>
+        <menuitem value="regular" data-l10n-id="vapor-routing-regular" />
+        <menuitem value="tor" data-l10n-id="vapor-routing-tor" />
+        <menuitem value="scramjet" data-l10n-id="vapor-routing-scramjet" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <label><html:h4 data-l10n-id="vapor-routing-scramjet-header" /></label>
+  <hbox align="center">
+    <label for="vaporRoutingScramjetProxy" data-l10n-id="vapor-routing-scramjet-proxy" />
+    <html:input id="vaporRoutingScramjetProxy" preference="vapor.routing.scramjet.proxy" />
+  </hbox>
+  <hbox align="center">
+    <label for="vaporRoutingScramjetTemplate" data-l10n-id="vapor-routing-scramjet-template" />
+    <html:input id="vaporRoutingScramjetTemplate" preference="vapor.routing.scramjet.url-template" />
+  </hbox>
+  <label><html:h4 data-l10n-id="vapor-routing-openvpn-header" /></label>
+  <hbox align="center">
+    <label for="vaporRoutingOpenVPNBinary" data-l10n-id="vapor-routing-openvpn-binary" />
+    <html:input id="vaporRoutingOpenVPNBinary" preference="vapor.routing.openvpn.binary" />
+  </hbox>
+  <hbox align="center">
+    <label for="vaporRoutingOpenVPNProfile" data-l10n-id="vapor-routing-openvpn-profile" />
+    <html:input id="vaporRoutingOpenVPNProfile" preference="vapor.routing.openvpn.profile" />
+  </hbox>
+  <checkbox id="vaporRoutingOpenVPNAutoConnect"
+            preference="vapor.routing.openvpn.auto-connect"
+            data-l10n-id="vapor-routing-openvpn-auto-connect" />
+  <checkbox id="vaporRoutingOpenVPNWarn"
+            preference="vapor.routing.openvpn.warn-disconnected"
+            data-l10n-id="vapor-routing-openvpn-warn" />
+</groupbox>

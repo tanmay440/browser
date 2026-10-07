@@ -1,0 +1,16 @@
+diff --git a/docshell/base/nsAboutRedirector.cpp b/docshell/base/nsAboutRedirector.cpp
+--- a/docshell/base/nsAboutRedirector.cpp
++++ b/docshell/base/nsAboutRedirector.cpp
+@@ -220,5 +220,11 @@ static const RedirEntry kRedirMap[] = {
+     {"sync-log", "chrome://global/content/aboutSyncLog.html",
+      nsIAboutModule::ALLOW_SCRIPT},
+-    {"telemetry", "chrome://global/content/aboutTelemetry.xhtml",
++    {"telemetry", "chrome://browser/content/aboutTelemetry.xhtml",
+      nsIAboutModule::ALLOW_SCRIPT | nsIAboutModule::IS_SECURE_CHROME_UI},
++    {"vapor", "chrome://browser/content/aboutVapor.xhtml",
++     nsIAboutModule::ALLOW_SCRIPT | nsIAboutModule::IS_SECURE_CHROME_UI},
++    {"reading", "chrome://browser/content/aboutReading.xhtml",
++     nsIAboutModule::ALLOW_SCRIPT | nsIAboutModule::IS_SECURE_CHROME_UI},
++    {"laser", "chrome://browser/content/aboutLaser.xhtml",
++     nsIAboutModule::ALLOW_SCRIPT | nsIAboutModule::IS_SECURE_CHROME_UI},
+ #ifndef MOZ_WIDGET_ANDROID
