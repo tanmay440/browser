@@ -24,9 +24,11 @@ function renderEntries(output, entries, emptyText) {
     const kind = document.createElement("strong");
     kind.textContent = entry.kind || "Vapor";
     const details = document.createElement("span");
-    details.textContent = entry.kind === "Crashes"
-      ? ` ${entry.url || "unknown URL"} — memory: ${entry.memory || "unknown"}; cause: ${entry.cause || "unknown"} (${new Date(entry.time).toLocaleString()})`
-      : ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
+    details.textContent = entry.chain
+      ? ` ${entry.original || "unknown URL"} → ${entry.final || "unknown destination"} (${entry.redirectCount || 0} redirects, ${new Date(entry.time).toLocaleString()})`
+      : entry.kind === "Crashes"
+        ? ` ${entry.url || "unknown URL"} — memory: ${entry.memory || "unknown"}; cause: ${entry.cause || "unknown"} (${new Date(entry.time).toLocaleString()})`
+        : ` ${entry.action || entry.tag || "action"} — ${entry.host || "local page"} (${new Date(entry.time).toLocaleString()})`;
     item.append(kind, details);
     output.appendChild(item);
   }
@@ -52,10 +54,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     const { VaporTabManagement } = ChromeUtils.importESModule(
       "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs"
     );
-    const [filterEntries, privacyEntries, crashEntries] = await Promise.all([
+    const { VaporRedirectInspector } = ChromeUtils.importESModule(
+      "resource:///modules/zen/uichrome/VaporRedirectInspector.sys.mjs"
+    );
+    const [filterEntries, privacyEntries, crashEntries, redirectEntries] = await Promise.all([
       VaporFilter.getActivityLog(),
       VaporPrivacy.getActivityLog(),
       VaporTabManagement.getCrashLog(),
+      VaporRedirectInspector.getLog(),
     ]);
     renderEntries(
       document.getElementById("dom-filters-log"),
@@ -79,10 +85,17 @@ window.addEventListener("DOMContentLoaded", async () => {
       "No local DNS activity yet.",
     );
     renderEntries(
+      document.getElementById("redirects-log"),
+      redirectEntries,
+      "No redirect chains have been recorded.",
+    );
+    renderEntries(
       document.getElementById("crashes-log"),
       crashEntries,
       "No tab crashes have been recorded.",
     );
+    document.getElementById("redirects-summary").textContent =
+      `${redirectEntries.length} local redirect chains.`;
     document.getElementById("crashes-summary").textContent =
       `${crashEntries.length} local tab crashes.`;
     document.getElementById("dom-filters-summary").textContent =
@@ -94,7 +107,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("dns-summary").textContent =
       `${dnsEntries.length} local DNS and CNAME events.`;
   } catch {
-    for (const id of ["dom-filters-log", "privacy-log", "consent-log", "dns-log", "crashes-log"]) {
+    for (const id of ["dom-filters-log", "privacy-log", "consent-log", "dns-log", "redirects-log", "crashes-log"]) {
       const output = document.getElementById(id);
       output.replaceChildren();
       output.appendChild(document.createElement("li")).textContent =

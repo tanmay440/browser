@@ -1,0 +1,82 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* Round 10 UI/chrome surfaces. */
+#vapor-command-palette,
+#vapor-shortcut-sheet,
+#vapor-redirect-inspector {
+  min-width: 520px;
+  max-width: 820px;
+  padding: 12px;
+  background: var(--zen-colors-primary, #202124);
+  color: var(--zen-colors-secondary, #f5f5f5);
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 45%);
+}
+
+#vapor-command-palette-input {
+  margin-bottom: 8px;
+  min-height: 34px;
+}
+
+#vapor-command-palette-results {
+  min-height: 170px;
+  max-height: 480px;
+}
+
+#vapor-command-palette-results richlistitem {
+  min-height: 38px;
+  padding: 7px 10px;
+}
+
+#vapor-command-palette-results richlistitem[selected] {
+  background: color-mix(in srgb, Highlight 25%, transparent);
+}
+
+#vapor-status-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2147483000;
+  min-height: 22px;
+  padding: 2px 8px;
+  gap: 14px;
+  align-items: center;
+  background: color-mix(in srgb, Canvas 92%, transparent);
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+#vapor-status-bar label {
+  white-space: nowrap;
+  opacity: .86;
+}
+
+#vapor-shortcut-sheet {
+  min-width: 420px;
+}
+
+.vapor-shortcut-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.vapor-shortcut-category {
+  margin-top: 8px;
+  font-weight: 700;
+  color: Highlight;
+}
+
+.vapor-shortcut-key {
+  min-width: 130px;
+  font-family: monospace;
+}
+
+#vapor-redirect-inspector label {
+  margin: 3px 0;
+  white-space: pre-wrap;
+}

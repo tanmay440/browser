@@ -173,6 +173,14 @@ export class VaporRoutingService {
     );
   }
 
+  get vpnState() {
+    return this.#vpnState;
+  }
+
+  getRouteStatus(tab) {
+    return this.#routeStatus(this.getTabType(tab));
+  }
+
   getTabType(tab) {
     const type = tab?.getAttribute(TAB_TYPE_ATTRIBUTE);
     return TAB_TYPES.has(type) ? type : "regular";

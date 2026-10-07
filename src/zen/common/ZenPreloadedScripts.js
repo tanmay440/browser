@@ -15,6 +15,7 @@
     VaporLaser: "resource:///modules/zen/laser/VaporLaser.sys.mjs",
     VaporRouting: "resource:///modules/zen/routing/VaporRouting.sys.mjs",
     VaporTabManagement: "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs",
+    VaporUIChrome: "resource:///modules/zen/uichrome/VaporUIChrome.sys.mjs",
   });
 
   Services.scriptloader.loadSubScript("chrome://browser/content/zen-components/ZenSpaceBookmarksStorage.js", this);
@@ -29,6 +30,7 @@
   VaporLaser.init(window);
   VaporRouting.init(window);
   VaporTabManagement.init(window);
+  VaporUIChrome.init(window);
 
   let scripts = [
     "chrome://browser/content/ZenStartup.mjs",

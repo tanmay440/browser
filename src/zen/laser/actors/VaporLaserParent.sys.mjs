@@ -7,6 +7,7 @@ import { Services } from "resource://gre/modules/Services.sys.mjs";
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
+  VaporKillCounter: "resource:///modules/zen/uichrome/VaporKillCounter.sys.mjs",
 });
 
 /**
@@ -36,7 +37,11 @@ export class VaporLaserParent extends JSWindowActorParent {
         return false;
       case "VaporLaser:AddRules": {
         const { entries, pageURL, notes } = message.data || {};
-        return lazy.VaporShield.addLaserRules(entries, pageURL, notes);
+        const added = await lazy.VaporShield.addLaserRules(entries, pageURL, notes);
+        if (Array.isArray(added) && added.length) {
+          await lazy.VaporKillCounter.record(added.length, "laser");
+        }
+        return added;
       }
       case "VaporLaser:RemoveRules":
         return lazy.VaporShield.removeUserRules(message.data?.rules || []);

@@ -120,6 +120,20 @@ let JSWINDOWACTORS = {
     remoteTypes: ["web", "file"],
     safeForUntrustedWebProcess: true,
   },
+  VaporUIChrome: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporUIChromeParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporUIChromeChild.sys.mjs",
+      events: {
+        DOMContentLoaded: {},
+      },
+    },
+    allFrames: false,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
   VaporTabManagement: {
     parent: {
       esModuleURI: "resource:///actors/VaporTabManagementParent.sys.mjs",

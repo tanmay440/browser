@@ -29,6 +29,7 @@ DIRS += [
     "routing",
     "templates",
     "tab-management",
+    "ui-chrome",
     "sync",
     "window-drag",
 ]

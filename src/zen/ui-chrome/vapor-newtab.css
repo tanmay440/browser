@@ -1,0 +1,79 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+.vapor-newtab-body {
+  margin: 0;
+  min-height: 100vh;
+  color: #f5f7fb;
+  background: #10131a;
+  font-family: system-ui, sans-serif;
+}
+
+#vapor-newtab {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 12vh 8vw 7vh;
+  background-color: #10131a;
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: overlay;
+}
+
+.vapor-newtab-brand {
+  font-size: clamp(3rem, 9vw, 7rem);
+  letter-spacing: .18em;
+  font-weight: 800;
+}
+
+#vapor-newtab header p { opacity: .7; }
+
+.vapor-newtab-search {
+  display: flex;
+  max-width: 740px;
+  margin: 3.5rem 0 2rem;
+}
+
+.vapor-newtab-search input {
+  flex: 1;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.vapor-newtab-search button,
+.vapor-newtab-templates button {
+  border: 0;
+  border-radius: 0 8px 8px 0;
+  padding: 0 18px;
+  background: #67d4bc;
+  color: #10201e;
+  cursor: pointer;
+}
+
+.vapor-newtab-sites,
+.vapor-newtab-templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  max-width: 740px;
+}
+
+.vapor-newtab-sites a,
+.vapor-newtab-templates button {
+  display: block;
+  padding: 13px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 10%);
+  color: inherit;
+  text-decoration: none;
+}
+
+.vapor-newtab-templates { margin-top: 2rem; }
+.vapor-newtab-templates h2 { grid-column: 1 / -1; font-size: 1rem; opacity: .8; }
+.vapor-newtab-templates button { border-radius: 8px; color: inherit; background: rgb(255 255 255 / 10%); }
+#vapor-newtab footer { margin-top: 3rem; opacity: .72; }
+#vapor-newtab details { margin-top: 1rem; opacity: .8; }
+#vapor-newtab details input { min-width: 320px; }

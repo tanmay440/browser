@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vapor Reading List</title>
+  <link rel="stylesheet" href="chrome://browser/content/zen-styles/about-reading.css" />
+  <script type="application/javascript" src="chrome://browser/content/aboutReading.js" />
+</head>
+<body>
+  <header>
+    <h1>Reading List</h1>
+    <input id="reading-search" type="search" placeholder="Search saved articles" />
+    <label>Auto-delete after <input id="reading-auto-delete" type="number" min="0" value="0" /> days</label>
+  </header>
+  <main id="reading-list"></main>
+  <section id="reading-view" aria-live="polite"></section>
+</body>
+</html>
