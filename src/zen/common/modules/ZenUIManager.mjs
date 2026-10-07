@@ -753,12 +753,18 @@ window.gZenUIManager = {
 
   // Section: Notification messages
   _createToastElement(messageId, options) {
-    const createButton = () => {
+    const buttonOptions = options.buttons || (options.button ? [options.button] : []);
+    const createButton = buttonData => {
       const button = document.createXULElement("button");
-      button.id = options.button.id;
+      button.id = buttonData.id;
       button.classList.add("footer-button");
       button.classList.add("primary");
-      button.addEventListener("command", options.button.command);
+      if (buttonData.l10nId) {
+        document.l10n.setAttributes(button, buttonData.l10nId);
+      } else if (buttonData.label) {
+        button.label = buttonData.label;
+      }
+      button.addEventListener("command", buttonData.command);
       return button;
     };
 
@@ -766,13 +772,11 @@ window.gZenUIManager = {
     for (const child of this._toastContainer.children) {
       if (child._messageId === messageId) {
         child.removeAttribute("button");
-        if (options.button) {
-          const button = createButton();
-          const existingButton = child.querySelector("button");
-          if (existingButton) {
-            existingButton.remove();
+        child.querySelectorAll("button").forEach(button => button.remove());
+        if (buttonOptions.length) {
+          for (const buttonData of buttonOptions) {
+            child.appendChild(createButton(buttonData));
           }
-          child.appendChild(button);
           child.setAttribute("button", true);
         }
         return [child, true];
@@ -790,9 +794,10 @@ window.gZenUIManager = {
       element.appendChild(description);
     }
     wrapper.appendChild(element);
-    if (options.button) {
-      const button = createButton();
-      wrapper.appendChild(button);
+    if (buttonOptions.length) {
+      for (const buttonData of buttonOptions) {
+        wrapper.appendChild(createButton(buttonData));
+      }
       wrapper.setAttribute("button", true);
     }
     wrapper.classList.add("zen-toast");

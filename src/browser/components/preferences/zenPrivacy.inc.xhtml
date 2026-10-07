@@ -104,6 +104,66 @@
             data-l10n-id="vapor-privacy-script-blocking" />
   <description class="description-deemphasized" data-l10n-id="vapor-privacy-script-help" />
 
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-broom-settings-header"/></label>
+  <checkbox id="vaporBroomEnabled" preference="vapor.broom.enabled" data-l10n-id="vapor-broom-enabled" />
+  <hbox align="center">
+    <label for="vaporBroomMode" data-l10n-id="vapor-broom-mode" />
+    <menulist id="vaporBroomMode" preference="vapor.broom.mode">
+      <menupopup>
+        <menuitem value="full" data-l10n-id="vapor-broom-mode-full" />
+        <menuitem value="cookies-only" data-l10n-id="vapor-broom-mode-cookies" />
+        <menuitem value="trackers-only" data-l10n-id="vapor-broom-mode-trackers" />
+        <menuitem value="keep-all" data-l10n-id="vapor-broom-mode-keep" />
+      </menupopup>
+    </menulist>
+    <label for="vaporBroomDelay" data-l10n-id="vapor-broom-delay" />
+    <menulist id="vaporBroomDelay" preference="vapor.broom.delay-ms">
+      <menupopup>
+        <menuitem value="0" label="0s" />
+        <menuitem value="2000" label="2s" />
+        <menuitem value="5000" label="5s" />
+        <menuitem value="10000" label="10s" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <checkbox id="vaporBroomToast" preference="vapor.broom.toast" data-l10n-id="vapor-broom-toast" />
+  <checkbox id="vaporBroomLoginDetection" preference="vapor.broom.login-detection" data-l10n-id="vapor-broom-login-detection" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-broom-remembered-sites" />
+    <spacer flex="1" />
+    <button id="vaporBroomRememberedSave" data-l10n-id="vapor-broom-save" />
+  </hbox>
+  <html:textarea id="vaporBroomRememberedSites" rows="5" aria-label="Remembered sites" />
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-reflex-settings-header"/></label>
+  <checkbox id="vaporReflexEnabled" preference="vapor.reflex.enabled" data-l10n-id="vapor-reflex-enabled" />
+  <hbox align="center">
+    <label for="vaporReflexMode" data-l10n-id="vapor-reflex-mode" />
+    <menulist id="vaporReflexMode" preference="vapor.reflex.mode">
+      <menupopup>
+        <menuitem value="aggressive" data-l10n-id="vapor-reflex-mode-aggressive" />
+        <menuitem value="polite" data-l10n-id="vapor-reflex-mode-polite" />
+        <menuitem value="manual" data-l10n-id="vapor-reflex-mode-manual" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <checkbox id="vaporReflexPreConsent" preference="vapor.reflex.pre-consent" data-l10n-id="vapor-reflex-pre-consent" />
+  <checkbox id="vaporReflexCMPAPI" preference="vapor.reflex.cmp-api" data-l10n-id="vapor-reflex-cmp-api" />
+  <checkbox id="vaporReflexFailureNotifications" preference="vapor.reflex.failure-notifications" data-l10n-id="vapor-reflex-failure-notifications" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-reflex-languages" />
+    <spacer flex="1" />
+  </hbox>
+  <html:input id="vaporReflexLanguages" preference="vapor.reflex.languages" aria-label="Consent languages" />
+  <hbox align="center">
+    <label data-l10n-id="vapor-reflex-phrases" />
+    <spacer flex="1" />
+    <button id="vaporReflexPhrasesSave" data-l10n-id="vapor-reflex-save" />
+  </hbox>
+  <html:textarea id="vaporReflexPhrases" rows="8" aria-label="Consent phrases JSON" />
+
   <hbox align="center">
     <label data-l10n-id="vapor-privacy-https-exceptions" />
     <spacer flex="1" />

@@ -313,6 +313,20 @@ const globalActionsTemplate = [
     },
   },
   {
+    l10nId: "vapor-action-remember-current-site",
+    command: window => {
+      const { VaporBroom } = ChromeUtils.importESModule(
+        "resource:///modules/zen/privacy/VaporBroom.sys.mjs",
+      );
+      return VaporBroom.toggleRemembered(window.gBrowser.currentURI.host, true);
+    },
+    icon: "chrome://browser/skin/zen-icons/bookmark.svg",
+    isAvailable: window => {
+      const uri = window.gBrowser.currentURI;
+      return !!uri?.schemeIs && (uri.schemeIs("http") || uri.schemeIs("https"));
+    },
+  },
+  {
     l10nId: "zen-action-print",
     command: "cmd_print",
     icon: "chrome://browser/skin/zen-icons/print.svg",

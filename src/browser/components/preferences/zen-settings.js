@@ -31,6 +31,10 @@ const { VaporPrivacy } = ChromeUtils.importESModule(
   "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs"
 );
 
+const { VaporBroom } = ChromeUtils.importESModule(
+  "resource:///modules/zen/privacy/VaporBroom.sys.mjs"
+);
+
 var gVaporShieldSettings = {
   _initialized: false,
   _allRules: "",
@@ -175,6 +179,14 @@ var gVaporPrivacySettings = {
       const overrides = document.getElementById("vaporPrivacyUAOverrides");
       VaporPrivacy.setUAOverrides(overrides.value).then(() => this._refresh());
     });
+    document.getElementById("vaporBroomRememberedSave")?.addEventListener("command", () => {
+      const sites = document.getElementById("vaporBroomRememberedSites");
+      VaporBroom.setRememberedSites(sites.value).then(() => this._refresh());
+    });
+    document.getElementById("vaporReflexPhrasesSave")?.addEventListener("command", () => {
+      const phrases = document.getElementById("vaporReflexPhrases");
+      VaporBroom.setConsentPhrases(phrases.value).then(() => this._refresh());
+    });
     await this._refresh();
   },
 
@@ -182,6 +194,8 @@ var gVaporPrivacySettings = {
     const rules = document.getElementById("vaporPrivacyURLStripRules");
     const exceptions = document.getElementById("vaporHTTPSExceptions");
     const uaOverrides = document.getElementById("vaporPrivacyUAOverrides");
+    const rememberedSites = document.getElementById("vaporBroomRememberedSites");
+    const reflexPhrases = document.getElementById("vaporReflexPhrases");
     const status = document.getElementById("vaporPrivacyDohStatus");
     if (!rules || !exceptions || !status) {
       return;
@@ -190,6 +204,12 @@ var gVaporPrivacySettings = {
     exceptions.value = await VaporPrivacy.getHTTPSExceptions();
     if (uaOverrides) {
       uaOverrides.value = await VaporPrivacy.getUAOverrides();
+    }
+    if (rememberedSites) {
+      rememberedSites.value = await VaporBroom.getRememberedSites();
+    }
+    if (reflexPhrases) {
+      reflexPhrases.value = await VaporBroom.getConsentPhrases();
     }
     const resolver = Services.prefs.getStringPref("vapor.privacy.doh.resolver", "mullvad");
     status.textContent = `${VaporPrivacy.dohEnabled ? "DoH enabled" : "DoH disabled"} — ${resolver}`;
@@ -1515,6 +1535,61 @@ Preferences.addAll([
   },
   {
     id: "vapor.privacy.script-blocking.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.broom.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.broom.mode",
+    type: "string",
+    default: "full",
+  },
+  {
+    id: "vapor.broom.delay-ms",
+    type: "int",
+    default: 2000,
+  },
+  {
+    id: "vapor.broom.toast",
+    type: "bool",
+    default: false,
+  },
+  {
+    id: "vapor.broom.login-detection",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.reflex.enabled",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.reflex.mode",
+    type: "string",
+    default: "aggressive",
+  },
+  {
+    id: "vapor.reflex.pre-consent",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.reflex.languages",
+    type: "string",
+    default: "en,de,fr,es,it,nl,pt,pl",
+  },
+  {
+    id: "vapor.reflex.cmp-api",
+    type: "bool",
+    default: true,
+  },
+  {
+    id: "vapor.reflex.failure-notifications",
     type: "bool",
     default: true,
   },

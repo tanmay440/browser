@@ -5,3 +5,4 @@
         content/vapor/url-strip-list.txt                         (../../zen/privacy/url-strip-list.txt)
         content/vapor/https-warning.xhtml                         (../../zen/privacy/https-warning.xhtml)
         content/vapor/https-warning.js                            (../../zen/privacy/https-warning.js)
+        content/vapor/consent-phrases.json                        (../../zen/privacy/consent-phrases.json)

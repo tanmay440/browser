@@ -5,16 +5,19 @@
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   VaporPrivacy: "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
+  VaporBroom: "resource:///modules/zen/privacy/VaporBroom.sys.mjs",
 });
 
 export class VaporPrivacyParent extends JSWindowActorParent {
   async receiveMessage(message) {
     switch (message.name) {
-      case "VaporPrivacy:GetConfig":
-        return lazy.VaporPrivacy.getBrowserPrivacyConfiguration(
+      case "VaporPrivacy:GetConfig": {
+        const privacy = await lazy.VaporPrivacy.getBrowserPrivacyConfiguration(
           message.data?.host || "",
           message.data?.href || "",
         );
+        return { ...privacy, reflex: await lazy.VaporBroom.getReflexConfig() };
+      }
       case "VaporPrivacy:ClipboardReadRequest":
         return lazy.VaporPrivacy.requestClipboardPermission(
           message.data?.host || "",
@@ -22,6 +25,19 @@ export class VaporPrivacyParent extends JSWindowActorParent {
         );
       case "VaporPrivacy:TemporaryScripts":
         lazy.VaporPrivacy.allowTemporaryScripts(message.data?.host || "");
+        return true;
+      case "VaporBroom:DeleteTrackingCookies":
+        return lazy.VaporBroom.deleteTrackingCookies(message.data?.host || "");
+      case "VaporBroom:ConsentAction":
+        return lazy.VaporBroom.logConsent(
+          message.data?.action || "action",
+          message.data?.host || "",
+          message.data || {},
+        );
+      case "VaporBroom:ConsentFailure":
+        return lazy.VaporBroom.notifyConsentFailure(message.data?.host || "");
+      case "VaporBroom:RunReflex":
+        this.sendAsyncMessage("VaporBroom:RunReflex");
         return true;
       case "VaporPrivacy:Log":
         return lazy.VaporPrivacy.record(

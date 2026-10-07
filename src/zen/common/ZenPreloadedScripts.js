@@ -9,6 +9,7 @@
     gZenSpaceRoutingManager:
       "resource:///modules/zen/spacerouting/ZenSpaceRoutingManager.sys.mjs",
     VaporPrivacy: "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
+    VaporBroom: "resource:///modules/zen/privacy/VaporBroom.sys.mjs",
     VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
     VaporFilter: "resource:///modules/zen/filter/VaporFilter.sys.mjs",
     VaporLaser: "resource:///modules/zen/laser/VaporLaser.sys.mjs",
@@ -20,6 +21,7 @@
   // begins. It wraps the existing service-worker interception controller so
   // blocked service-worker fetches are synthesized too.
   VaporPrivacy.init(window);
+  VaporBroom.init(window);
   VaporShield.init(window);
   VaporFilter.init(window);
   VaporLaser.init(window);

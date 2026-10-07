@@ -58,8 +58,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     );
     renderEntries(
       document.getElementById("privacy-log"),
-      privacyEntries.filter(entry => entry.kind !== "DNS"),
+      privacyEntries.filter(entry => entry.kind !== "DNS" && entry.kind !== "Consent Actions"),
       "No local network privacy actions yet.",
+    );
+    renderEntries(
+      document.getElementById("consent-log"),
+      privacyEntries.filter(entry => entry.kind === "Consent Actions"),
+      "No local consent actions yet.",
     );
     const dnsEntries = privacyEntries.filter(entry => entry.kind === "DNS");
     renderEntries(
@@ -70,11 +75,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("dom-filters-summary").textContent =
       `${filterEntries.length} local filter actions. Nothing is sent off this device.`;
     document.getElementById("privacy-summary").textContent =
-      `${privacyEntries.length - dnsEntries.length} local network privacy actions.`;
+      `${privacyEntries.filter(entry => entry.kind !== "DNS" && entry.kind !== "Consent Actions").length} local network privacy actions.`;
+    document.getElementById("consent-summary").textContent =
+      `${privacyEntries.filter(entry => entry.kind === "Consent Actions").length} local consent actions.`;
     document.getElementById("dns-summary").textContent =
       `${dnsEntries.length} local DNS and CNAME events.`;
   } catch {
-    for (const id of ["dom-filters-log", "privacy-log", "dns-log"]) {
+    for (const id of ["dom-filters-log", "privacy-log", "consent-log", "dns-log"]) {
       const output = document.getElementById(id);
       output.replaceChildren();
       output.appendChild(document.createElement("li")).textContent =

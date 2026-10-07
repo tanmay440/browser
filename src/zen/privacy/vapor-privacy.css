@@ -29,3 +29,21 @@
 #vapor-privacy-indicator[ua-override="true"] {
   text-shadow: 0 0 4px #5aa9ff;
 }
+
+#vapor-broom-indicator {
+  min-width: 24px;
+  margin-inline: 2px;
+  padding-inline: 3px;
+}
+
+#vapor-broom-indicator .vapor-broom-symbol {
+  font-size: 14px;
+}
+
+#vapor-broom-indicator[broom-state="active"] {
+  opacity: .65;
+}
+
+#vapor-broom-indicator[broom-state="remembered"] {
+  color: #2ecc71;
+}

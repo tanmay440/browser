@@ -18,6 +18,16 @@ const SAFE_FONTS = new Set([
 ]);
 const INVISIBLE_COPY_CHARS = /[\u200B\u200C\u200D\uFEFF\u202A-\u202E\u2060\u2061\u2062\u2063\u2064\u2066\u2067\u2068\u2069\uFE00-\uFE0F\u{E0000}-\u{E007F}]/gu;
 const GENERIC_RENDERER = "Generic WebGL Renderer";
+const REFLEX_TRACKING_COOKIES = [
+  /^_ga(?:$|_)/i, /^_gid$/i, /^_gat(?:$|_)/i, /^_fbp$/i, /^_fbc$/i,
+  /^_gcl(?:$|_)/i, /^_tt/i, /^_uetsid$/i, /^_uetvid$/i, /^fr$/i,
+  /^ide$/i, /^test_cookie$/i, /^nid$/i, /^consent$/i, /^_pk_/i,
+  /^__hstc$/i, /^__hssc$/i, /^__hssrc$/i, /^hubspotutk$/i, /^intercom-id/i,
+  /^ajs_/i, /^amplitude_/i, /^mp_/i, /^_mkto_/i, /^pardot/i,
+  /^drift_/i, /^optimizely/i,
+];
+const REFLEX_REJECT_WORDS = /(?:reject|decline|deny|refuse|essential|necessary|no thanks|nur notwendige|ablehnen|refuser|rechazar|rifiuta|weigeren|odrzuć)/i;
+const REFLEX_CUSTOMIZE_WORDS = /(?:customi[sz]e|preferences?|settings|manage|options|einstellungen|paramètres|preferencias|impostazioni|voorkeuren|ustawienia)/i;
 const CHROME_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
@@ -65,10 +75,23 @@ export class VaporPrivacyChild extends JSWindowActorChild {
   #copyHandler = null;
   #deviceIds = new Map();
   #fontProxy = null;
+  #reflex = {
+    enabled: true,
+    mode: "aggressive",
+    preConsent: true,
+    languages: ["en", "de", "fr", "es", "it", "nl", "pt", "pl"],
+    phrases: {},
+    useCMPAPI: true,
+    failureNotifications: true,
+  };
+  #reflexHandled = false;
 
   receiveMessage(message) {
     if (message.name === "VaporPrivacy:ScriptState") {
       this.#scriptState = message.data?.state || this.#scriptState;
+    } else if (message.name === "VaporBroom:RunReflex") {
+      this.#reflexHandled = false;
+      this.#runReflexSweep("manual-trigger");
     }
   }
 
@@ -104,6 +127,7 @@ export class VaporPrivacyChild extends JSWindowActorChild {
     this.#installSpeculativeObserver();
     this.#installScriptGate();
     this.#installClipboard();
+    this.#installReflex();
     this.sendQuery("VaporPrivacy:GetConfig", {
       host: this.document.location?.hostname || "",
       href: this.document.location?.href || "",
@@ -119,11 +143,250 @@ export class VaporPrivacyChild extends JSWindowActorChild {
       this.#clipboardPermission = config?.clipboardPermission || 0;
       this.#scriptEnabled = config?.scriptEnabled !== false;
       this.#scriptState = config?.scriptState || "first-party";
+      this.#reflex = config?.reflex || this.#reflex;
       if (config?.fingerprintingEnabled !== false && !this.#fingerprintingInstalled) {
         this.#installFingerprinting();
         this.#fingerprintingInstalled = true;
       }
       this.#applyLanguageAndTimezone();
+    }).catch(() => {});
+  }
+
+  #installReflex() {
+    const window = this.document.defaultView;
+    if (window.top !== window) {
+      return;
+    }
+    this.#deletePreConsentCookies();
+    this.document.addEventListener(
+      "DOMContentLoaded",
+      () => window.setTimeout(() => this.#runReflexSweep("dom-content-loaded"), 500),
+      { once: true, capture: true },
+    );
+    window.addEventListener(
+      "load",
+      () => window.setTimeout(() => this.#runReflexSweep("window-load"), 1_000),
+      { once: true },
+    );
+    window.setTimeout(() => this.#runReflexSweep("final-sweep"), 5_000);
+  }
+
+  #isTrackingCookie(name) {
+    return name.toLowerCase() !== "__cf_bm" && REFLEX_TRACKING_COOKIES.some(pattern => pattern.test(name));
+  }
+
+  #deletePreConsentCookies() {
+    if (!this.#reflex.enabled || !this.#reflex.preConsent || this.#reflex.mode === "manual") {
+      return;
+    }
+    const cookieNames = this.document.cookie
+      .split(";")
+      .map(cookie => cookie.split("=", 1)[0].trim())
+      .filter(name => name && this.#isTrackingCookie(name));
+    const host = this.document.location.hostname;
+    for (const name of cookieNames) {
+      this.document.cookie = `${name}=; Max-Age=0; path=/`;
+      if (host.includes(".")) {
+        this.document.cookie = `${name}=; Max-Age=0; path=/; domain=${host}`;
+      }
+    }
+    this.sendQuery("VaporBroom:DeleteTrackingCookies", { host }).catch(() => {});
+    if (cookieNames.length) {
+      this.#logConsent("pre-consent-cookies-deleted", { count: cookieNames.length });
+    }
+  }
+
+  #consentPhrases() {
+    const phrases = [];
+    for (const language of this.#reflex.languages || []) {
+      for (const phrase of this.#reflex.phrases?.[language] || []) {
+        phrases.push(String(phrase).toLowerCase());
+      }
+    }
+    return phrases.length ? phrases : ["accept all", "reject all", "cookie preferences", "we use cookies", "consent"];
+  }
+
+  #bannerText(element) {
+    return (element?.innerText || element?.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 4_000).toLowerCase();
+  }
+
+  #hasConsentText(element) {
+    const text = this.#bannerText(element);
+    return this.#consentPhrases().some(phrase => phrase && text.includes(phrase));
+  }
+
+  #hasConsentPosition(element) {
+    try {
+      const style = this.document.defaultView.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      const zIndex = Number.parseInt(style.zIndex, 10);
+      const edge = rect.top <= 12 || rect.bottom >= this.document.defaultView.innerHeight - 12;
+      return ["fixed", "sticky"].includes(style.position) || (edge && zIndex >= 100);
+    } catch {
+      return false;
+    }
+  }
+
+  #findConsentBanner() {
+    const selectors = [
+      "#onetrust-banner-sdk", "#CybotCookiebotDialog", "#cookie-notice",
+      "#gdpr-cookie-notice", "#sp-cc", "#usercentrics-root", "#truste-consent-track",
+      ".cc-window", "#hs-eu-cookie-confirmation", "#tarteaucitronRoot",
+      "[id*='cookie' i]", "[class*='cookie' i]", "[id*='consent' i]", "[class*='consent' i]",
+    ];
+    const candidates = [];
+    for (const selector of selectors) {
+      try {
+        for (const element of this.document.querySelectorAll(selector)) {
+          if (!candidates.includes(element)) candidates.push(element);
+          if (candidates.length >= 300) break;
+        }
+      } catch {}
+      if (candidates.length >= 300) break;
+    }
+    if (candidates.length < 300) {
+      for (const element of this.document.querySelectorAll("body > div, body > section, [role='dialog'], dialog")) {
+        if (!candidates.includes(element)) candidates.push(element);
+        if (candidates.length >= 300) break;
+      }
+    }
+    const cmpObject = ["__cmp", "__tcfapi", "__uspapi", "OnetrustActiveGroups", "Cookiebot", "gdprframework", "consentManager"]
+      .some(name => this.document.defaultView[name]);
+    for (const element of candidates) {
+      const idOrClass = `${element.id || ""} ${element.className || ""}`.toLowerCase();
+      const domPattern = /cookie|consent|gdpr|onetrust|cookiebot|usercentrics|tarteaucitron/.test(idOrClass);
+      const score = Number(cmpObject) + Number(domPattern) + Number(this.#hasConsentText(element)) + Number(this.#hasConsentPosition(element));
+      if (score >= 2) return element;
+    }
+    return null;
+  }
+
+  #actionText(element) {
+    return `${element.innerText || element.textContent || ""} ${element.getAttribute?.("aria-label") || ""} ${element.value || ""}`
+      .replace(/\\s+/g, " ").trim().toLowerCase();
+  }
+
+  #findAction(root, expression) {
+    const elements = root?.querySelectorAll?.("button, [role='button'], input[type='button'], input[type='submit'], a") || [];
+    return [...elements].find(element => expression.test(this.#actionText(element)) && !element.disabled);
+  }
+
+  #callCMPAPI() {
+    if (!this.#reflex.useCMPAPI) return false;
+    const window = this.document.defaultView;
+    try {
+      if (typeof window.__tcfapi === "function") {
+        window.__tcfapi("rejectAll", 2, () => {});
+        this.#logConsent("tcf-v2-reject-all");
+        return true;
+      }
+      if (typeof window.OneTrust?.RejectAll === "function") {
+        window.OneTrust.RejectAll();
+        this.#logConsent("onetrust-reject-all");
+        return true;
+      }
+      if (typeof window.Cookiebot?.decline === "function") {
+        window.Cookiebot.decline();
+        this.#logConsent("cookiebot-decline");
+        return true;
+      }
+      if (typeof window.CookieConsent?.denyAll === "function") {
+        window.CookieConsent.denyAll();
+        this.#logConsent("cookieconsent-deny-all");
+        return true;
+      }
+    } catch (error) {
+      this.#logConsent("cmp-api-failed", { error: String(error) });
+    }
+    return false;
+  }
+
+  async #customizeAndReject(root) {
+    const customize = this.#findAction(root, REFLEX_CUSTOMIZE_WORDS);
+    if (customize) {
+      customize.click();
+      await new Promise(resolve => this.document.defaultView.setTimeout(resolve, 80));
+    }
+    const checkboxes = root.querySelectorAll?.("input[type='checkbox'], [role='checkbox']") || [];
+    let changed = false;
+    for (const checkbox of checkboxes) {
+      const label = this.#actionText(checkbox.closest("label, li, div") || checkbox);
+      if (!/necessary|essential|required|strictly|nécessaire|notwendig|necesari/.test(label)) {
+        if (checkbox.checked || checkbox.getAttribute("aria-checked") === "true") {
+          checkbox.click();
+          changed = true;
+        }
+      }
+    }
+    const save = this.#findAction(root, /save|confirm|submit|continue|apply|done|save preferences|speichern|enregistrer|guardar|salvar/i);
+    if (save) {
+      save.click();
+      return true;
+    }
+    return changed;
+  }
+
+  #hideBanner(root) {
+    if (!root) return;
+    root.setAttribute("data-vapor-reflex-hidden", "true");
+    root.style.setProperty("display", "none", "important");
+    root.style.setProperty("visibility", "hidden", "important");
+    root.setAttribute("aria-hidden", "true");
+  }
+
+  async #runReflexSweep(phase) {
+    if (!this.#reflex.enabled) return;
+    if (phase === "final-sweep") this.#deletePreConsentCookies();
+    if (this.#reflexHandled) return;
+    const banner = this.#findConsentBanner();
+    if (!banner) return;
+    this.#reflexHandled = true;
+    const clear = () => this.document.defaultView.setTimeout(() => {
+      this.sendQuery("VaporBroom:DeleteTrackingCookies", {
+        host: this.document.location.hostname,
+      }).catch(() => {});
+    }, 500);
+    const manualTrigger = phase === "manual-trigger";
+    if (this.#reflex.mode === "manual" && !manualTrigger) {
+      this.#hideBanner(banner);
+      this.#logConsent("manual-banner-hidden", { phase });
+      return;
+    }
+    const reject = this.#findAction(banner, REFLEX_REJECT_WORDS);
+    if (this.#reflex.mode === "polite" && !reject) {
+      this.#hideBanner(banner);
+      this.#logConsent("polite-banner-hidden", { phase });
+      return;
+    }
+    if (this.#callCMPAPI()) {
+      this.#hideBanner(banner);
+      clear();
+      return;
+    }
+    if (reject) {
+      reject.click();
+      this.#hideBanner(banner);
+      this.#logConsent("reject-button-clicked", { phase });
+      clear();
+      return;
+    }
+    if ((this.#reflex.mode === "aggressive" || manualTrigger) && await this.#customizeAndReject(banner)) {
+      this.#hideBanner(banner);
+      this.#logConsent("customize-rejected", { phase });
+      clear();
+      return;
+    }
+    this.#hideBanner(banner);
+    this.#logConsent("fallback-banner-hidden", { phase, warning: true });
+    this.sendQuery("VaporBroom:ConsentFailure", { host: this.document.location.hostname }).catch(() => {});
+    clear();
+  }
+
+  #logConsent(action, detail = {}) {
+    this.sendQuery("VaporBroom:ConsentAction", {
+      action,
+      host: this.document.location.hostname,
+      ...detail,
     }).catch(() => {});
   }
 

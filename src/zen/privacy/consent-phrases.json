@@ -1,0 +1,10 @@
+{
+  "en": ["accept all", "accept cookies", "reject all", "decline all", "cookie preferences", "we use cookies", "consent", "strictly necessary", "only necessary cookies"],
+  "de": ["alle akzeptieren", "alle ablehnen", "nur notwendige", "datenschutz", "einwilligung"],
+  "fr": ["tout accepter", "tout refuser", "préférences des cookies", "consentement", "cookies nécessaires"],
+  "es": ["aceptar todo", "rechazar todo", "solo necesarias", "consentimiento", "cookies necesarias"],
+  "it": ["accetta tutto", "rifiuta tutto", "solo necessarie", "consenso", "cookie necessarie"],
+  "nl": ["alles accepteren", "alles weigeren", "alleen noodzakelijke", "toestemming", "noodzakelijke cookies"],
+  "pt": ["aceitar tudo", "rejeitar tudo", "apenas necessárias", "consentimento", "cookies necessárias"],
+  "pl": ["zaakceptuj wszystko", "odrzuć wszystko", "tylko niezbędne", "zgoda", "niezbędne pliki cookie"]
+}

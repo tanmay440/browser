@@ -66,6 +66,40 @@
 - name: vapor.privacy.script-blocking.enabled
   value: true
 
+# Vapor Round 7 storage privacy.
+- name: vapor.broom.enabled
+  value: true
+
+- name: vapor.broom.mode
+  value: full
+
+- name: vapor.broom.delay-ms
+  value: 2000
+
+- name: vapor.broom.toast
+  value: false
+
+- name: vapor.broom.login-detection
+  value: true
+
+- name: vapor.reflex.enabled
+  value: true
+
+- name: vapor.reflex.mode
+  value: aggressive
+
+- name: vapor.reflex.pre-consent
+  value: true
+
+- name: vapor.reflex.languages
+  value: en,de,fr,es,it,nl,pt,pl
+
+- name: vapor.reflex.cmp-api
+  value: true
+
+- name: vapor.reflex.failure-notifications
+  value: true
+
 - name: network.trr.mode
   value: 3
 
