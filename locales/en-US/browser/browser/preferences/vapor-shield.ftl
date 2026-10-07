@@ -103,3 +103,23 @@ vapor-broom-login = You just logged into { $host }. Remember this site?
 vapor-broom-remember-login = Remember
 vapor-broom-forget-login = Forget
 vapor-reflex-failure = Cookie consent could not be fully rejected on { $host }.
+
+# Vapor Round 8 routing and OpenVPN
+vapor-routing-settings-header = Routing
+vapor-routing-settings-description = Choose how new tabs are routed. Tor and Scramjet tabs fail closed if their route is unavailable.
+vapor-routing-default-tab-type = Default new tab type
+vapor-routing-regular = Regular
+vapor-routing-tor = Tor
+vapor-routing-scramjet = Scramjet
+vapor-routing-scramjet-header = Scramjet
+vapor-routing-scramjet-proxy = Scramjet proxy URL
+vapor-routing-scramjet-template = URL rewrite template (optional; use the URL placeholder)
+vapor-routing-openvpn-header = OpenVPN launcher
+vapor-routing-openvpn-binary = OpenVPN GUI executable override
+vapor-routing-openvpn-profile = Default profile name
+vapor-routing-openvpn-auto-connect = Connect OpenVPN when Vapor starts
+vapor-routing-openvpn-warn = Warn when regular tabs are not covered by OpenVPN
+vapor-openvpn-not-found = OpenVPN GUI was not found. Set an override or install OpenVPN Community.
+vapor-openvpn-download = Download OpenVPN
+vapor-openvpn-disconnected = OpenVPN is disconnected. Regular tabs use the system network.
+vapor-routing-mixed-warning = This workspace contains mixed tab routing. Check the route before sharing a link.

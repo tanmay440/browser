@@ -26,6 +26,7 @@ DIRS += [
     "share",
     "spaces",
     "space-routing",
+    "routing",
     "sync",
     "window-drag",
 ]

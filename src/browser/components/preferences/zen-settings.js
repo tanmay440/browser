@@ -1459,6 +1459,46 @@ Preferences.addAll([
     default: false,
   },
   {
+    id: "vapor.routing.default-tab-type",
+    type: "string",
+    default: "regular",
+  },
+  {
+    id: "vapor.routing.scramjet.proxy",
+    type: "string",
+    default: "",
+  },
+  {
+    id: "vapor.routing.scramjet.url-template",
+    type: "string",
+    default: "",
+  },
+  {
+    id: "vapor.routing.openvpn.binary",
+    type: "string",
+    default: "",
+  },
+  {
+    id: "vapor.routing.openvpn.profile",
+    type: "string",
+    default: "default.ovpn",
+  },
+  {
+    id: "vapor.routing.openvpn.auto-connect",
+    type: "bool",
+    default: false,
+  },
+  {
+    id: "vapor.routing.openvpn.warn-disconnected",
+    type: "bool",
+    default: false,
+  },
+  {
+    id: "vapor.routing.tor.kill-on-last-tab",
+    type: "bool",
+    default: true,
+  },
+  {
     id: "vapor.filter.enabled",
     type: "bool",
     default: true,

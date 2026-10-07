@@ -173,4 +173,43 @@
   <html:textarea id="vaporHTTPSExceptions"
                  rows="5"
                  aria-label="HTTPS-only exceptions" />
+
+
+  <separator class="thin" />
+  <label><html:h3 data-l10n-id="vapor-routing-settings-header" /></label>
+  <description class="description-deemphasized" data-l10n-id="vapor-routing-settings-description" />
+  <hbox align="center">
+    <label for="vaporRoutingDefaultTabType" data-l10n-id="vapor-routing-default-tab-type" />
+    <menulist id="vaporRoutingDefaultTabType" preference="vapor.routing.default-tab-type">
+      <menupopup>
+        <menuitem value="regular" data-l10n-id="vapor-routing-regular" />
+        <menuitem value="tor" data-l10n-id="vapor-routing-tor" />
+        <menuitem value="scramjet" data-l10n-id="vapor-routing-scramjet" />
+      </menupopup>
+    </menulist>
+  </hbox>
+  <label><html:h4 data-l10n-id="vapor-routing-scramjet-header" /></label>
+  <hbox align="center">
+    <label for="vaporRoutingScramjetProxy" data-l10n-id="vapor-routing-scramjet-proxy" />
+    <html:input id="vaporRoutingScramjetProxy" preference="vapor.routing.scramjet.proxy" />
+  </hbox>
+  <hbox align="center">
+    <label for="vaporRoutingScramjetTemplate" data-l10n-id="vapor-routing-scramjet-template" />
+    <html:input id="vaporRoutingScramjetTemplate" preference="vapor.routing.scramjet.url-template" />
+  </hbox>
+  <label><html:h4 data-l10n-id="vapor-routing-openvpn-header" /></label>
+  <hbox align="center">
+    <label for="vaporRoutingOpenVPNBinary" data-l10n-id="vapor-routing-openvpn-binary" />
+    <html:input id="vaporRoutingOpenVPNBinary" preference="vapor.routing.openvpn.binary" />
+  </hbox>
+  <hbox align="center">
+    <label for="vaporRoutingOpenVPNProfile" data-l10n-id="vapor-routing-openvpn-profile" />
+    <html:input id="vaporRoutingOpenVPNProfile" preference="vapor.routing.openvpn.profile" />
+  </hbox>
+  <checkbox id="vaporRoutingOpenVPNAutoConnect"
+            preference="vapor.routing.openvpn.auto-connect"
+            data-l10n-id="vapor-routing-openvpn-auto-connect" />
+  <checkbox id="vaporRoutingOpenVPNWarn"
+            preference="vapor.routing.openvpn.warn-disconnected"
+            data-l10n-id="vapor-routing-openvpn-warn" />
 </groupbox>

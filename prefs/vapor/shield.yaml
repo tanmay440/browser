@@ -117,3 +117,28 @@
 - name: network.prefetch-next
   value: false
   locked: true
+
+# Vapor Round 8 tab routing and OpenVPN launcher.
+- name: vapor.routing.default-tab-type
+  value: regular
+
+- name: vapor.routing.scramjet.proxy
+  value: ""
+
+- name: vapor.routing.scramjet.url-template
+  value: ""
+
+- name: vapor.routing.openvpn.binary
+  value: ""
+
+- name: vapor.routing.openvpn.profile
+  value: default.ovpn
+
+- name: vapor.routing.openvpn.auto-connect
+  value: false
+
+- name: vapor.routing.openvpn.warn-disconnected
+  value: false
+
+- name: vapor.routing.tor.kill-on-last-tab
+  value: true

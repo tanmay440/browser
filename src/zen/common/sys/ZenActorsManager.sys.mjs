@@ -106,6 +106,20 @@ let JSWINDOWACTORS = {
     remoteTypes: ["web", "file"],
     safeForUntrustedWebProcess: true,
   },
+  VaporRouting: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporRoutingParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporRoutingChild.sys.mjs",
+      events: {
+        DOMContentLoaded: {},
+      },
+    },
+    allFrames: true,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
   VaporPrivacy: {
     parent: {
       esModuleURI: "resource:///actors/VaporPrivacyParent.sys.mjs",

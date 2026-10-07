@@ -13,6 +13,7 @@
     VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
     VaporFilter: "resource:///modules/zen/filter/VaporFilter.sys.mjs",
     VaporLaser: "resource:///modules/zen/laser/VaporLaser.sys.mjs",
+    VaporRouting: "resource:///modules/zen/routing/VaporRouting.sys.mjs",
   });
 
   Services.scriptloader.loadSubScript("chrome://browser/content/zen-components/ZenSpaceBookmarksStorage.js", this);
@@ -25,6 +26,7 @@
   VaporShield.init(window);
   VaporFilter.init(window);
   VaporLaser.init(window);
+  VaporRouting.init(window);
 
   let scripts = [
     "chrome://browser/content/ZenStartup.mjs",
