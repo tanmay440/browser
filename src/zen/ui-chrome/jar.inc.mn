@@ -7,3 +7,7 @@
         content/browser/zen-styles/about-reading.css (../../zen/ui-chrome/about-reading.css)
         content/browser/aboutReading.xhtml (../../zen/ui-chrome/aboutReading.xhtml)
         content/browser/aboutReading.js (../../zen/ui-chrome/aboutReading.js)
+        content/browser/zen-components/VaporSetupWizard.mjs (../../zen/ui-chrome/VaporSetupWizard.mjs)
+        content/browser/zen-styles/about-laser.css (../../zen/ui-chrome/about-laser.css)
+        content/browser/aboutLaser.xhtml (../../zen/ui-chrome/aboutLaser.xhtml)
+        content/browser/aboutLaser.js (../../zen/ui-chrome/aboutLaser.js)

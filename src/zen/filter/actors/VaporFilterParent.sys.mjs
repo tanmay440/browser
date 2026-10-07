@@ -2,6 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import { Services } from "resource://gre/modules/Services.sys.mjs";
+
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   VaporFilter: "resource:///modules/zen/filter/VaporFilter.sys.mjs",
@@ -22,8 +24,12 @@ export class VaporFilterParent extends JSWindowActorParent {
         );
       case "VaporFilter:LogFilter":
         return lazy.VaporFilter.recordFilter(message.data || {});
-      case "VaporFilter:LogOverlay":
+      case "VaporFilter:LogOverlay": {
+        if (message.data?.action === "vaporized") {
+          Services.obs.notifyObservers(null, "vapor-shield-breaker", JSON.stringify(message.data));
+        }
         return lazy.VaporFilter.recordOverlay(message.data || {});
+      }
       case "VaporFilter:RememberOverlay":
         return lazy.VaporFilter.rememberOverlay(
           message.data?.host || "",

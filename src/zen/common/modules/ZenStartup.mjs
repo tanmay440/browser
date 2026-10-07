@@ -172,12 +172,13 @@ class ZenStartup {
 
   #checkForWelcomePage() {
     const kWelcomeScreenSeenPref = "zen.welcome-screen.seen";
+    const kVaporSetupSeenPref = "vapor.first-run.seen";
     if (Services.env.get("MOZ_HEADLESS")) {
       Services.prefs.setBoolPref(kWelcomeScreenSeenPref, true);
+      Services.prefs.setBoolPref(kVaporSetupSeenPref, true);
       return;
     }
-    if (!Services.prefs.getBoolPref(kWelcomeScreenSeenPref, false)) {
-      Services.prefs.setBoolPref(kWelcomeScreenSeenPref, true);
+    if (!Services.prefs.getBoolPref(kVaporSetupSeenPref, false)) {
       Services.prefs.setStringPref(
         "zen.updates.last-build-id",
         Services.appinfo.appBuildID
@@ -186,6 +187,15 @@ class ZenStartup {
         "zen.updates.last-version",
         Services.appinfo.version
       );
+      Services.scriptloader.loadSubScript(
+        "chrome://browser/content/zen-components/VaporSetupWizard.mjs",
+        window
+      );
+      window.startVaporSetupWizard?.(window);
+      return;
+    }
+    if (!Services.prefs.getBoolPref(kWelcomeScreenSeenPref, false)) {
+      Services.prefs.setBoolPref(kWelcomeScreenSeenPref, true);
       Services.scriptloader.loadSubScript(
         "chrome://browser/content/zen-components/ZenWelcome.mjs",
         window

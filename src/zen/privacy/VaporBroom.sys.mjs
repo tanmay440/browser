@@ -187,6 +187,17 @@ class VaporBroomService {
     return normalized;
   }
 
+  async getActivityLog() {
+    try {
+      const { VaporPrivacy } = ChromeUtils.importESModule(
+        "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
+      );
+      return (await VaporPrivacy.getActivityLog()).filter(entry => entry.kind === "Broom");
+    } catch {
+      return [];
+    }
+  }
+
   async getRememberedSites() {
     await this.#ensureLoaded();
     return [...this.#rememberedSites].join("\n");

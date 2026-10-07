@@ -14,3 +14,28 @@
 
 - name: vapor.newtab.background
   value: ""
+
+# Optional local sound effects.
+- name: vapor.sound.master-volume
+  value: 30
+
+- name: vapor.sound.laser
+  value: true
+
+- name: vapor.sound.shield
+  value: true
+
+- name: vapor.sound.tabClose
+  value: true
+
+- name: vapor.sound.workspace
+  value: true
+
+- name: vapor.sound.tor
+  value: true
+
+- name: vapor.sound.killSwitch
+  value: true
+
+- name: vapor.sound.milestone
+  value: true

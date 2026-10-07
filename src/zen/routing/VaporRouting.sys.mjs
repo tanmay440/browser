@@ -867,6 +867,7 @@ export class VaporRoutingService {
         if (this.getTabType(tab) !== type) {
           continue;
         }
+        if (!online) Services.obs.notifyObservers(null, "vapor-kill-switch", type);
         this.#sendRouteCommand(tab, online ? "Unfreeze" : "Freeze", {
           reason:
             type === "tor"

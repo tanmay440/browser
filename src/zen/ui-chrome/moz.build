@@ -7,6 +7,9 @@ EXTRA_JS_MODULES.zen.uichrome += [
   "VaporNewTab.sys.mjs",
   "VaporReadingList.sys.mjs",
   "VaporRedirectInspector.sys.mjs",
+  "VaporSetupWizard.mjs",
+  "VaporSound.sys.mjs",
+  "VaporStats.sys.mjs",
   "VaporUIChrome.sys.mjs",
 ]
 

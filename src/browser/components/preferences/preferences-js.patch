@@ -24,11 +24,11 @@ index 94612d8e28af58fcb04914440348b899a0a1e08f..da3b1ffd09745d09589283356d1001db
        this._initted = true;
        let template = document.getElementById("template-" + categoryName);
 -      if (template && !srdSectionPrefs.all) {
-+      if (template && (!srdSectionPrefs.all || categoryName.startsWith("paneZen"))) {
++      if (template && (!srdSectionPrefs.all || categoryName.startsWith("paneZen") || categoryName.startsWith("paneVapor"))) {
          // Replace the template element with the nodes inside of it.
          template.replaceWith(template.content);
  
-@@ -562,6 +565,11 @@ function init_all() {
+@@ -562,6 +565,16 @@ function init_all() {
    register_module("paneHome", gHomePane);
    register_module("paneSearch", gSearchPane);
    register_module("panePrivacy", gPrivacyPane);
@@ -37,6 +37,11 @@ index 94612d8e28af58fcb04914440348b899a0a1e08f..da3b1ffd09745d09589283356d1001db
 +  register_module("paneZenCKS", gZenCKSSettings);
 +  register_module("paneZenMarketplace", gZenMarketplaceManager);
 +  register_module("paneVaporShield", gVaporShieldSettings);
++  register_module("paneVaporCookies", gVaporRound11Settings);
++  register_module("paneVaporRouting", gVaporRound11Settings);
++  register_module("paneVaporWorkspaces", gVaporRound11Settings);
++  register_module("paneVaporTabs", gVaporRound11Settings);
++  register_module("paneVaporSound", gVaporRound11Settings);
  
    // Restore the cached Firefox Labs nav button visibility so it shows
    // immediately when recipes are expected to be available, before

@@ -24,6 +24,8 @@ ChromeUtils.defineESModuleGetters(lazy, {
   VaporRedirectInspector: "resource:///modules/zen/uichrome/VaporRedirectInspector.sys.mjs",
   VaporRouting: "resource:///modules/zen/routing/VaporRouting.sys.mjs",
   VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
+  VaporSound: "resource:///modules/zen/uichrome/VaporSound.sys.mjs",
+  VaporStats: "resource:///modules/zen/uichrome/VaporStats.sys.mjs",
   VaporTabManagement: "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs",
   VaporWorkspaceTemplates: "resource:///modules/zen/templates/VaporWorkspaceTemplates.sys.mjs",
 });
@@ -60,6 +62,12 @@ class VaporUIChromeService {
   #paletteDataPromise = null;
   #paletteDataCache = null;
   #observingNetwork = false;
+  #observingSounds = false;
+  #sessionLaserKills = 0;
+  #centuryShown = false;
+  #konami = [];
+  #memorySampleAt = 0;
+  #workspaceListeners = new WeakMap();
 
   init(window) {
     if (!window?.gBrowser || this.#windows.has(window)) {
@@ -68,13 +76,28 @@ class VaporUIChromeService {
     this.#windows.add(window);
     window.addEventListener("keydown", this, true);
     window.addEventListener("TabSelect", this);
+    window.addEventListener("TabOpen", this);
+    window.addEventListener("TabClose", this);
     window.addEventListener("DOMContentLoaded", this, true);
     window.addEventListener("vapor-shield-blocked", this);
     window.addEventListener("unload", () => this.#uninit(window), { once: true });
     window.gBrowser.addTabsProgressListener(this);
     this.#installContextMenu(window);
     this.#installStatusBar(window);
+    this.#installPageStatsPopup(window);
     this.#observeNetwork();
+    lazy.VaporSound.init(window);
+    this.#observeSounds();
+    const workspaceManager = window.gZenWorkspaces;
+    if (workspaceManager?.addChangeListeners) {
+      const listener = () => {
+        const tabs = window.document.getElementById("tabbrowser-tabs");
+        tabs?.classList.add("vapor-workspace-slide");
+        window.setTimeout(() => tabs?.classList.remove("vapor-workspace-slide"), 220);
+      };
+      workspaceManager.addChangeListeners(listener);
+      this.#workspaceListeners.set(window, listener);
+    }
     for (const tab of window.gBrowser.tabs) {
       this.#stats.set(tab.linkedBrowser, this.#newStats());
     }
@@ -83,9 +106,14 @@ class VaporUIChromeService {
   #uninit(window) {
     window.removeEventListener("keydown", this, true);
     window.removeEventListener("TabSelect", this);
+    window.removeEventListener("TabOpen", this);
+    window.removeEventListener("TabClose", this);
     window.removeEventListener("DOMContentLoaded", this, true);
     window.removeEventListener("vapor-shield-blocked", this);
     window.gBrowser.removeTabsProgressListener(this);
+    const workspaceManager = window.gZenWorkspaces;
+    const workspaceListener = this.#workspaceListeners.get(window);
+    if (workspaceListener) workspaceManager?.removeChangeListeners?.(workspaceListener);
     const timer = this.#downloadTimers.get(window);
     if (timer) {
       window.clearInterval(timer);
@@ -96,9 +124,26 @@ class VaporUIChromeService {
       Services.obs.removeObserver(this, "http-on-stop-request");
       this.#observingNetwork = false;
     }
+    if (!this.#windows.size && this.#observingSounds) {
+      Services.obs.removeObserver(this, "vapor-laser-zap");
+      for (const topic of ["vapor-laser-zap", "vapor-shield-breaker", "vapor-kill-switch", "vapor-adblocker-milestone"]) {
+        Services.obs.removeObserver(lazy.VaporSound, topic);
+      }
+      this.#observingSounds = false;
+    }
   }
 
   observe(subject, topic) {
+    if (topic === "vapor-laser-zap") {
+      let count = 1;
+      try { count = JSON.parse(subject || "{}").count || 1; } catch {}
+      this.#sessionLaserKills += Number(count) || 1;
+      if (!this.#centuryShown && this.#sessionLaserKills >= 100) {
+        this.#centuryShown = true;
+        for (const window of this.#windows) this.#showCenturyToast(window);
+      }
+      return;
+    }
     if (topic !== "http-on-modify-request" && topic !== "http-on-stop-request") {
       return;
     }
@@ -155,6 +200,14 @@ class VaporUIChromeService {
         event.stopImmediatePropagation();
         this.openShortcutSheet(window || event.view);
       }
+      this.#checkKonami(event, window || event.view);
+      return;
+    }
+    if (event.type === "TabOpen") {
+      if ((window?.gBrowser?.tabs?.length || 0) > 50) this.#showManyTabsToast(window);
+      return;
+    }
+    if (event.type === "TabClose") {
       return;
     }
     if (event.type === "TabSelect") {
@@ -163,9 +216,17 @@ class VaporUIChromeService {
       return;
     }
     if (event.type === "vapor-shield-blocked") {
-      const browser = window?.gBrowser?.selectedBrowser;
+      const browser = event.detail?.browser || window?.gBrowser?.selectedBrowser;
       if (browser) {
-        this.#statsFor(browser).blocked++;
+        const stats = this.#statsFor(browser);
+        stats.blocked++;
+        stats.bytes += Number(event.detail?.bytes) || 0;
+        const type = String(event.detail?.type || "other").split(";", 1)[0];
+        stats.types[type] = (stats.types[type] || 0) + 1;
+        lazy.VaporStats.recordPageStats(browser.currentURI?.spec || "", {
+          ...stats,
+          bandwidth: stats.bytes,
+        }).catch(() => {});
         this.#updateStatus(window);
       }
     }
@@ -181,6 +242,11 @@ class VaporUIChromeService {
       this.#updateStatus(browser.ownerGlobal);
     }
     if (stateFlags & flags.STATE_STOP) {
+      const stats = this.#statsFor(browser);
+      lazy.VaporStats.recordRoute(lazy.VaporRouting.getTabType(browser.ownerGlobal?.gBrowser?.getTabForBrowser(browser)), {
+        bytes: stats.bytes,
+        duration: Date.now() - stats.started,
+      }).catch(() => {});
       this.#updateStatus(browser.ownerGlobal);
     }
   }
@@ -195,7 +261,7 @@ class VaporUIChromeService {
   }
 
   #newStats() {
-    return { bytes: 0, requests: 0, blocked: 0, jsMs: 0, started: Date.now() };
+    return { bytes: 0, requests: 0, blocked: 0, jsMs: 0, types: {}, started: Date.now() };
   }
 
   #statsFor(browser) {
@@ -217,6 +283,10 @@ class VaporUIChromeService {
     if (Number(metrics.requests) > stats.requests) {
       stats.requests = Number(metrics.requests);
     }
+    lazy.VaporStats.recordPageStats(browser.currentURI?.spec || "", {
+      ...stats,
+      bandwidth: stats.bytes,
+    }).catch(() => {});
     this.#updateStatus(browser.ownerGlobal);
   }
 
@@ -259,6 +329,13 @@ class VaporUIChromeService {
   }
 
   async #updateStatus(window) {
+    if (Date.now() - this.#memorySampleAt > 60_000 && window?.gBrowser) {
+      this.#memorySampleAt = Date.now();
+      const rawMemory = this.#memoryLabel();
+      const resident = Number(rawMemory.replace(/[^0-9]/g, "")) || 0;
+      const hibernated = window.gBrowser.tabs.filter(tab => tab.hasAttribute("vapor-hibernated")).length;
+      lazy.VaporStats.recordMemory(resident * 1024 * 1024, hibernated).catch(() => {});
+    }
     const bar = this.#statusBars.get(window);
     if (!bar) {
       return;
@@ -271,6 +348,12 @@ class VaporUIChromeService {
     const browser = window.gBrowser?.selectedBrowser;
     const tab = window.gBrowser?.selectedTab;
     const stats = this.#statsFor(browser);
+    const workspaceManager = window.gZenWorkspaces;
+    const workspace = workspaceManager?.getWorkspaceFromId?.(tab?.getAttribute("zen-workspace-id") || workspaceManager.activeWorkspace);
+    if (workspace) {
+      const tabs = window.gBrowser.tabs.filter(candidate => candidate.getAttribute("zen-workspace-id") === workspace.uuid).length;
+      lazy.VaporStats.recordWorkspace(workspace.uuid, tabs).catch(() => {});
+    }
     const route = lazy.VaporRouting.getTabType(tab);
     const memory = this.#memoryLabel();
     const downloads = await this.#downloadLabel();
@@ -489,8 +572,8 @@ class VaporUIChromeService {
   #settingsEntries(window) {
     const settings = [
       ["General", "paneGeneral"], ["Privacy", "panePrivacy"], ["Adblocker", "paneVaporShield"],
-      ["Routing", "panePrivacy"], ["Workspaces", "paneZenTabManagement"], ["Tabs", "paneZenTabManagement"],
-      ["Appearance", "paneZenLooks"], ["Advanced", "paneAdvanced"],
+      ["Cookies", "paneVaporCookies"], ["Routing", "paneVaporRouting"], ["Workspaces", "paneVaporWorkspaces"],
+      ["Tabs", "paneVaporTabs"], ["Appearance", "paneZenLooks"], ["Sound", "paneVaporSound"], ["Advanced", "paneAdvanced"],
     ];
     return settings.map(([name, pane]) => ({
       id: `settings:${pane}:${name}`,
@@ -606,6 +689,119 @@ class VaporUIChromeService {
       }
     }
     panel.openPopup(window.gBrowser?.selectedTab, "overlap", 0, 0, false, false);
+  }
+
+  #observeSounds() {
+    if (this.#observingSounds) return;
+    this.#observingSounds = true;
+    Services.obs.addObserver(this, "vapor-laser-zap");
+    for (const topic of ["vapor-laser-zap", "vapor-shield-breaker", "vapor-kill-switch", "vapor-adblocker-milestone"]) {
+      Services.obs.addObserver(lazy.VaporSound, topic);
+    }
+  }
+
+  #checkKonami(event, window) {
+    const key = event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight"
+      ? event.key
+      : event.key.toLowerCase();
+    this.#konami.push(key);
+    this.#konami = this.#konami.slice(-10);
+    const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    if (this.#konami.length === code.length && this.#konami.every((value, index) => value === code[index])) {
+      this.#konami = [];
+      const root = window?.document?.documentElement;
+      if (!root) return;
+      root.setAttribute("vapor-crt-mode", "true");
+      window.setTimeout(() => root.removeAttribute("vapor-crt-mode"), 30_000);
+    }
+  }
+
+  #showToast(window, text, className = "") {
+    if (!window?.document?.getElementById("browser")) return;
+    const old = window.document.querySelector(".vapor-round11-toast");
+    old?.remove();
+    const toast = window.document.createXULElement("label");
+    toast.className = `vapor-round11-toast ${className}`;
+    toast.setAttribute("value", text);
+    toast.setAttribute("role", "status");
+    window.document.getElementById("browser").appendChild(toast);
+    window.setTimeout(() => toast.remove(), 5_000);
+  }
+
+  #showCenturyToast(window) {
+    this.#showToast(window, "Century Club! 🎉", "vapor-century-toast");
+    const container = window.document.createXULElement("hbox");
+    container.className = "vapor-confetti";
+    for (let index = 0; index < 42; index++) {
+      const piece = window.document.createXULElement("label");
+      piece.setAttribute("value", "✦");
+      piece.style.setProperty("--vapor-confetti-delay", `${Math.random() * 300}ms`);
+      piece.style.setProperty("--vapor-confetti-x", `${(Math.random() - 0.5) * 80}vw`);
+      container.appendChild(piece);
+    }
+    window.document.getElementById("browser")?.appendChild(container);
+    window.setTimeout(() => container.remove(), 2_500);
+  }
+
+  #showManyTabsToast(window) {
+    if (window?.__vaporManyTabsToast) return;
+    window.__vaporManyTabsToast = true;
+    this.#showToast(window, "That's a lot of tabs. Maybe hibernate some? 😅");
+  }
+
+  #installPageStatsPopup(window) {
+    const install = () => {
+      const button = window.document.getElementById("vapor-shield-button");
+      if (!button || button.hasAttribute("data-vapor-page-stats")) return;
+      button.setAttribute("data-vapor-page-stats", "true");
+      button.addEventListener("click", event => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        this.#openPageStatsPopup(window, button);
+      }, true);
+    };
+    install();
+    window.setTimeout(install, 0);
+    window.setTimeout(install, 500);
+    window.addEventListener("DOMContentLoaded", install, { once: true });
+    window.addEventListener("load", install, { once: true });
+  }
+
+  async #openPageStatsPopup(window, anchor) {
+    let panel = window.document.getElementById("vapor-page-stats-popup");
+    if (!panel) {
+      panel = window.document.createXULElement("panel");
+      panel.id = "vapor-page-stats-popup";
+      panel.setAttribute("orient", "vertical");
+      window.document.getElementById("mainPopupSet")?.appendChild(panel);
+    }
+    const browser = window.gBrowser.selectedBrowser;
+    const stats = this.#statsFor(browser);
+    const stored = await lazy.VaporStats.getPageStats(browser.currentURI?.spec || "");
+    panel.replaceChildren();
+    const heading = window.document.createXULElement("label");
+    heading.setAttribute("value", "Vapor Shield — This Page");
+    heading.className = "vapor-page-stats-heading";
+    panel.appendChild(heading);
+    const values = [
+      ["Blocked requests", Math.max(stats.blocked, stored.blocked || 0)],
+      ["Stripped parameters", stored.stripped || 0],
+      ["Uncloaked CNAMEs", stored.uncloaked || 0],
+      ["Bandwidth saved", `${Math.round(Math.max(stats.bytes, stored.bandwidth || 0) / 1024)} KB`],
+      ["Requests", Math.max(stats.requests, stored.requests || 0)],
+      ["JavaScript", `${(Math.max(stats.jsMs, stored.jsMs || 0) / 1000).toFixed(1)}s`],
+    ];
+    for (const [label, value] of values) {
+      const row = window.document.createXULElement("label");
+      row.setAttribute("value", `${label}: ${value}`);
+      panel.appendChild(row);
+    }
+    const typeLabel = window.document.createXULElement("label");
+    typeLabel.setAttribute("value", `Breakdown: ${Object.entries(stored.types || {}).map(([type, count]) => `${type} ${count}`).join(" · ") || "no blocked resources yet"}`);
+    typeLabel.className = "vapor-page-stats-breakdown";
+    panel.appendChild(typeLabel);
+    panel.openPopup(anchor, "after_end", 0, 0, false, false);
   }
 
   #installContextMenu(window) {

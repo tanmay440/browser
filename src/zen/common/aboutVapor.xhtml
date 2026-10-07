@@ -8,51 +8,53 @@
   <script type="application/javascript" src="chrome://browser/content/aboutVapor.js" />
 </head>
 <body>
-  <main class="card">
+  <main class="card dashboard" id="vapor-dashboard">
     <div class="mark" aria-hidden="true">
-      <svg viewBox="0 0 128 128" role="img">
-        <circle cx="64" cy="64" r="18" />
-        <path d="M64 8v38M64 82v38M8 64h38M82 64h38" />
-      </svg>
+      <svg viewBox="0 0 128 128" role="img"><circle cx="64" cy="64" r="18" /><path d="M64 8v38M64 82v38M8 64h38M82 64h38" /></svg>
     </div>
     <h1>Vapor Browser</h1>
     <p class="tagline">The web, evaporated of nonsense.</p>
-    <dl>
+    <dl class="build-info">
       <div><dt>Version</dt><dd id="version">0.1.0-alpha</dd></div>
       <div><dt>Gecko version</dt><dd id="gecko-version">Loading…</dd></div>
       <div><dt>Build date</dt><dd id="build-date">Loading…</dd></div>
     </dl>
-    <p class="foundation">A clean, Windows-first browser foundation built on Gecko.</p>
-    <section class="activity" aria-labelledby="dom-filters-heading">
-      <h2 id="dom-filters-heading">DOM Filters</h2>
-      <p id="dom-filters-summary">Local activity from Vapor Filter and Shield Breaker.</p>
-      <ol id="dom-filters-log"><li>Loading local activity…</li></ol>
+
+    <section class="stats-section overview" aria-labelledby="overview-heading">
+      <h2 id="overview-heading">Overview</h2>
+      <div class="stats-grid">
+        <div><strong id="all-time-blocked">0</strong><span>ads blocked all time</span></div>
+        <div><strong id="session-blocked">0</strong><span>blocked this session</span></div>
+        <div><strong id="bandwidth-saved">0 B</strong><span>bandwidth saved</span></div>
+        <div><strong id="time-saved">0s</strong><span>time saved</span></div>
+      </div>
     </section>
-    <section class="activity" aria-labelledby="privacy-heading">
-      <h2 id="privacy-heading">Network Privacy</h2>
-      <p id="privacy-summary">URL stripping, referrer, HTTPS-only, and speculative-load actions.</p>
-      <ol id="privacy-log"><li>Loading local activity…</li></ol>
+
+    <section class="stats-section" aria-labelledby="activity-heading">
+      <h2 id="activity-heading">Today's Activity</h2>
+      <div id="activity-chart" class="activity-chart" aria-label="Blocks over the last 24 hours"></div>
     </section>
-    <section class="activity" aria-labelledby="consent-heading">
-      <h2 id="consent-heading">Consent Actions</h2>
-      <p id="consent-summary">Local consent actions performed by The Reflex.</p>
-      <ol id="consent-log"><li>Loading local activity…</li></ol>
+
+    <section class="stats-section split-section" aria-labelledby="domains-heading">
+      <div><h2 id="domains-heading">Top Blocked Domains</h2><ol id="top-domains"></ol></div>
+      <div><h2 id="types-heading">Blocked Resource Types</h2><ul id="resource-types"></ul></div>
     </section>
-    <section class="activity" aria-labelledby="dns-heading">
-      <h2 id="dns-heading">DNS</h2>
-      <p id="dns-summary">Local CNAME and DNS-over-HTTPS activity.</p>
-      <ol id="dns-log"><li>Loading local activity…</li></ol>
+
+    <section class="stats-section" aria-labelledby="laser-heading"><h2 id="laser-heading">Laser History</h2><ol id="laser-history"></ol></section>
+    <section class="stats-section" aria-labelledby="filter-heading"><h2 id="filter-heading">DOM Filters</h2><ol id="dom-filters-log"></ol></section>
+    <section class="stats-section" aria-labelledby="cname-heading"><h2 id="cname-heading">CNAME Uncloaking Log</h2><ol id="cname-log"></ol></section>
+    <section class="stats-section" aria-labelledby="url-heading"><h2 id="url-heading">URL Stripping Log</h2><ol id="url-strip-log"></ol></section>
+    <section class="stats-section" aria-labelledby="consent-heading"><h2 id="consent-heading">Consent Actions</h2><ol id="consent-log"></ol></section>
+    <section class="stats-section" aria-labelledby="cookie-heading"><h2 id="cookie-heading">Cookie Deletions</h2><ol id="cookie-log"></ol></section>
+    <section class="stats-section" aria-labelledby="dns-heading"><h2 id="dns-heading">DNS</h2><ol id="dns-log"></ol></section>
+    <section class="stats-section" aria-labelledby="redirects-heading"><h2 id="redirects-heading">Redirects</h2><ol id="redirects-log"></ol></section>
+
+    <section class="stats-section split-section" aria-labelledby="routing-heading">
+      <div><h2 id="routing-heading">Routing Stats</h2><ol id="routing-stats"></ol></div>
+      <div><h2 id="memory-heading">Memory</h2><p id="memory-stats">No samples yet.</p></div>
     </section>
-    <section class="activity" aria-labelledby="redirects-heading">
-      <h2 id="redirects-heading">Redirects</h2>
-      <p id="redirects-summary">Local redirect chains with three or more hops.</p>
-      <ol id="redirects-log"><li>Loading local activity…</li></ol>
-    </section>
-    <section class="activity" aria-labelledby="crashes-heading">
-      <h2 id="crashes-heading">Crashes</h2>
-      <p id="crashes-summary">Local tab crash history.</p>
-      <ol id="crashes-log"><li>Loading local activity…</li></ol>
-    </section>
+    <section class="stats-section" aria-labelledby="workspace-heading"><h2 id="workspace-heading">Workspace Breakdown</h2><ol id="workspace-breakdown"></ol></section>
+    <section class="stats-section" aria-labelledby="crashes-heading"><h2 id="crashes-heading">Crashes</h2><ol id="crashes-log"></ol></section>
   </main>
 </body>
 </html>

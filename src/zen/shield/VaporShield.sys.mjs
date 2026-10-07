@@ -11,6 +11,7 @@ import { CustomizableUI } from "moz-src:///browser/components/customizableui/Cus
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   VaporPrivacy: "resource:///modules/zen/privacy/VaporPrivacy.sys.mjs",
+  VaporStats: "resource:///modules/zen/uichrome/VaporStats.sys.mjs",
 });
 
 const PREF_ENABLED = "vapor.shield.enabled";
@@ -762,10 +763,22 @@ export class VaporShieldService {
     );
     interceptedChannel.finishSynthesizedResponse();
     this.#blockedCount++;
+    const browser = interceptedChannel.channel?.loadInfo?.browsingContext?.top?.embedderElement;
+    const tab = browser?.ownerGlobal?.gBrowser?.getTabForBrowser(browser);
+    const workspace = tab?.getAttribute("zen-workspace-id") || "Default";
+    if (this.#blockedCount % 100 === 0) {
+      Services.obs.notifyObservers(null, "vapor-adblocker-milestone", String(this.#blockedCount));
+    }
+    lazy.VaporStats.recordBlock({
+      url: spec,
+      type: response.contentType.split(";", 1)[0],
+      bytes: byteLength,
+      workspace,
+    }).catch(() => {});
     for (const window of this.#windows) {
       window.dispatchEvent(
         new window.CustomEvent("vapor-shield-blocked", {
-          detail: { spec, type: response.contentType },
+          detail: { spec, type: response.contentType, bytes: byteLength, browser },
         }),
       );
       this.#updateWidget(window);
@@ -783,7 +796,7 @@ export class VaporShieldService {
         defaultArea: CustomizableUI.AREA_NAVBAR,
         removable: true,
         label: "Vapor Shield",
-        tooltiptext: "Toggle Vapor Shield",
+        tooltiptext: "Vapor Shield — click for page stats",
         onCommand: () => this.toggleGlobal(),
         onCreated: (node) => {
           node.classList.add("vapor-shield-toolbarbutton");

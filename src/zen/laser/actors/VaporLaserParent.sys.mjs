@@ -8,6 +8,7 @@ const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
   VaporKillCounter: "resource:///modules/zen/uichrome/VaporKillCounter.sys.mjs",
+  VaporStats: "resource:///modules/zen/uichrome/VaporStats.sys.mjs",
 });
 
 /**
@@ -40,6 +41,16 @@ export class VaporLaserParent extends JSWindowActorParent {
         const added = await lazy.VaporShield.addLaserRules(entries, pageURL, notes);
         if (Array.isArray(added) && added.length) {
           await lazy.VaporKillCounter.record(added.length, "laser");
+          await lazy.VaporStats.recordLaser({
+            url: pageURL,
+            source: "Laser",
+            domains: added.map(rule => String(rule).replace(/^\|\|/, "").split(/[\^/]/, 1)[0]),
+            count: added.length,
+          });
+          Services.obs.notifyObservers(null, "vapor-laser-zap", JSON.stringify({
+            url: pageURL,
+            count: added.length,
+          }));
         }
         return added;
       }

@@ -61,6 +61,15 @@
   pointer-events: auto;
 }
 
+#vapor-routing-kill-switch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .35;
+  background: linear-gradient(125deg, transparent 46%, #ff8a80 47% 48%, transparent 49%), linear-gradient(35deg, transparent 53%, #ff8a80 54% 55%, transparent 56%);
+  pointer-events: none;
+}
+
 #vapor-routing-kill-switch .vapor-routing-kill-switch-card {
   max-width: min(560px, calc(100vw - 40px));
   padding: 24px;

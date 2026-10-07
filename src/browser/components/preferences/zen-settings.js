@@ -43,6 +43,10 @@ const { VaporTabManagement } = ChromeUtils.importESModule(
   "resource:///modules/zen/tabmanagement/VaporTabManagement.sys.mjs"
 );
 
+var gVaporRound11Settings = {
+  init() {},
+};
+
 var gVaporShieldSettings = {
   _initialized: false,
   _allRules: "",

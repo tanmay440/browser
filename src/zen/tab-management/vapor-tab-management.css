@@ -5,6 +5,18 @@
   font-size: .8em;
 }
 
+.tabbrowser-tab .tab-icon-image {
+  transition: filter 180ms ease-out;
+}
+.tabbrowser-tab[vapor-hibernated] .tab-icon-image {
+  filter: grayscale(1);
+  opacity: .6;
+}
+.tabbrowser-tab:not([vapor-hibernated]) .tab-icon-image {
+  filter: none;
+  opacity: 1;
+}
+
 #vapor-tab-search-panel {
   min-width: 520px;
   max-width: 760px;

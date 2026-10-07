@@ -20,6 +20,11 @@ const DEFAULT_SCRIPT_STATE = "first-party";
 const CHROME_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
+const lazy = {};
+ChromeUtils.defineESModuleGetters(lazy, {
+  VaporStats: "resource:///modules/zen/uichrome/VaporStats.sys.mjs",
+});
+
 export const PREF_URL_STRIPPING = "vapor.privacy.url-stripping.enabled";
 export const PREF_CNAME_UNCLOAKING = "vapor.privacy.cname-uncloaking.enabled";
 export const PREF_REFERRER_POLICY = "vapor.privacy.referrer-policy";
@@ -1145,6 +1150,7 @@ class VaporPrivacyService {
     });
     this.#logs = this.#logs.slice(0, MAX_LOG_ENTRIES);
     await this.#writeJSON(this.#logs);
+    lazy.VaporStats.recordPrivacy(action, detail).catch(() => {});
   }
 
   async #readChromeText(uri) {

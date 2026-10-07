@@ -80,3 +80,86 @@
   margin: 3px 0;
   white-space: pre-wrap;
 }
+
+#vapor-page-stats-popup {
+  min-width: 280px;
+  padding: 12px;
+  gap: 5px;
+  background: var(--zen-colors-primary, #202124);
+  color: var(--zen-colors-secondary, #f5f5f5);
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 10px;
+}
+.vapor-page-stats-heading { font-weight: 700; margin-bottom: 6px; }
+.vapor-page-stats-breakdown { margin-top: 6px; white-space: pre-wrap; }
+.vapor-round11-toast {
+  position: fixed;
+  inset-inline: 50%;
+  bottom: 44px;
+  z-index: 2147483646;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #1e252e;
+  color: white;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 35%);
+  font-weight: 600;
+  animation: vapor-toast-in 180ms ease-out;
+}
+.vapor-century-toast { background: linear-gradient(100deg, #7b42f6, #f76f53); }
+.vapor-confetti {
+  position: fixed;
+  inset: 35% 50% auto;
+  z-index: 2147483645;
+  pointer-events: none;
+}
+.vapor-confetti label {
+  position: absolute;
+  color: #67d4bc;
+  animation: vapor-confetti-fall 2.2s ease-out var(--vapor-confetti-delay) forwards;
+}
+@keyframes vapor-toast-in { from { opacity: 0; transform: translate(-50%, 10px); } }
+@keyframes vapor-confetti-fall { to { opacity: 0; transform: translate(var(--vapor-confetti-x), 50vh) rotate(620deg); } }
+:root[vapor-crt-mode]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(0 255 120 / 8%) 0 1px, transparent 1px 4px);
+  box-shadow: inset 0 0 8vw rgb(0 255 120 / 18%);
+  mix-blend-mode: screen;
+}
+:root[vapor-crt-mode] #browser { filter: sepia(.18) hue-rotate(80deg) saturate(.8); }
+#tabbrowser-tabs.vapor-workspace-slide { animation: vapor-workspace-slide 200ms ease-out; }
+@keyframes vapor-workspace-slide { from { transform: translateX(22px); opacity: .65; } to { transform: translateX(0); opacity: 1; } }
+#vapor-setup-wizard {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483640;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #071014 78%, transparent);
+  color: white;
+  font: 15px/1.45 system-ui, sans-serif;
+}
+.vapor-setup-card {
+  display: flex;
+  flex-direction: column;
+  width: min(680px, calc(100vw - 48px));
+  padding: 34px;
+  gap: 12px;
+  border: 1px solid rgb(103 212 188 / 45%);
+  border-radius: 18px;
+  background: #172029;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 55%);
+}
+.vapor-setup-progress { color: #67d4bc; font-size: 12px; }
+.vapor-setup-title { color: #aeb9c4; font-size: 13px; }
+.vapor-setup-heading { font-size: 28px; font-weight: 700; }
+.vapor-setup-description { color: #d3dbe1; max-width: 560px; white-space: pre-wrap; }
+.vapor-setup-card button { margin-top: 6px; padding: 8px 14px; }
+.vapor-setup-card button.primary { background: #67d4bc; color: #10201e; font-weight: 700; }
+.vapor-setup-actions { justify-content: end; gap: 8px; margin-top: 16px; }
+.vapor-setup-template-row { gap: 8px; flex-wrap: wrap; }
