@@ -89,6 +89,23 @@ let JSWINDOWACTORS = {
     remoteTypes: ["web", "file"],
     safeForUntrustedWebProcess: true,
   },
+  VaporFilter: {
+    parent: {
+      esModuleURI: "resource:///actors/VaporFilterParent.sys.mjs",
+    },
+    child: {
+      esModuleURI: "resource:///actors/VaporFilterChild.sys.mjs",
+      events: {
+        DOMDocElementInserted: {},
+        keydown: {
+          capture: true,
+        },
+      },
+    },
+    allFrames: true,
+    remoteTypes: ["web", "file"],
+    safeForUntrustedWebProcess: true,
+  },
 };
 
 if (!Services.appinfo.inSafeMode) {

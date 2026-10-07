@@ -1,3 +1,7 @@
+# Vapor Filter and Shield Breaker Round 4 preferences.
+- name: vapor.filter.enabled
+  value: true
+
 # Vapor Shield Round 2 preferences.
 # The global switch is user-controlled; the network interceptor consumes these
 # values in the parent process. DNS prefetch is disabled so blocked hosts are not

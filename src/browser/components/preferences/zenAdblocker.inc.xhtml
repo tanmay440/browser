@@ -46,4 +46,43 @@
                    readonly="readonly"
                    aria-label="Vapor Shield blocklist" />
   </groupbox>
+
+  <groupbox id="vaporFilterGroup"
+            data-category="paneVaporShield"
+            class="highlighting-group">
+    <label><html:h2 data-l10n-id="vapor-filter-settings-header"/></label>
+    <description class="description-deemphasized"
+                 data-l10n-id="vapor-filter-settings-description" />
+    <checkbox id="vaporFilterEnabled"
+              preference="vapor.filter.enabled"
+              data-l10n-id="vapor-filter-enable" />
+    <hbox align="center" class="vapor-shield-rule-toolbar">
+      <label id="vaporFilterRuleCount" data-l10n-id="vapor-filter-rule-count" />
+      <spacer flex="1" />
+      <button id="vaporFilterSave"
+              data-l10n-id="vapor-filter-save" />
+    </hbox>
+    <html:textarea id="vaporFilterRules"
+                   rows="12"
+                   aria-label="Vapor DOM element filters" />
+    <hbox align="center" class="vapor-shield-rule-toolbar">
+      <label data-l10n-id="vapor-overlay-phrases" />
+      <spacer flex="1" />
+      <button id="vaporOverlayPhrasesSave"
+              data-l10n-id="vapor-overlay-phrases-save" />
+    </hbox>
+    <html:textarea id="vaporOverlayPhrases"
+                   rows="6"
+                   aria-label="Shield Breaker overlay phrases" />
+    <hbox align="center" class="vapor-shield-rule-toolbar">
+      <label data-l10n-id="vapor-overlay-memory" />
+      <spacer flex="1" />
+      <button id="vaporOverlayMemoryClear"
+              data-l10n-id="vapor-overlay-memory-clear" />
+    </hbox>
+    <html:textarea id="vaporOverlayMemory"
+                   rows="8"
+                   readonly="readonly"
+                   aria-label="Shield Breaker overlay memory" />
+  </groupbox>
 </html:template>

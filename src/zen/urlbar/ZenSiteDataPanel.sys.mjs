@@ -15,6 +15,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
   FeatureCallout: "resource:///modules/asrouter/FeatureCallout.sys.mjs",
   gZenBoostsManager: "resource:///modules/zen/boosts/ZenBoostsManager.sys.mjs",
   VaporShield: "resource:///modules/zen/shield/VaporShield.sys.mjs",
+  VaporFilter: "resource:///modules/zen/filter/VaporFilter.sys.mjs",
 });
 
 export class nsZenSiteDataPanel {
@@ -22,6 +23,7 @@ export class nsZenSiteDataPanel {
     install: "extension",
     "site-protection": "shield",
     "vapor-shield": "shield",
+    "vapor-filter": "shield",
     "3rdPartyStorage": "cookie",
   };
 
@@ -612,6 +614,21 @@ export class nsZenSiteDataPanel {
         state: shieldEnabled ? SitePermissions.ALLOW : SitePermissions.BLOCK,
         scope: SitePermissions.SCOPE_PERSISTENT,
       });
+
+      const filterPermission = lazy.VaporFilter.getSitePermission(
+        gBrowser.currentURI
+      );
+      const filterEnabled =
+        filterPermission === Ci.nsIPermissionManager.DENY_ACTION
+          ? false
+          : filterPermission === Ci.nsIPermissionManager.ALLOW_ACTION
+            ? true
+            : lazy.VaporFilter.enabled;
+      permissions.push({
+        id: "vapor-filter",
+        state: filterEnabled ? SitePermissions.ALLOW : SitePermissions.BLOCK,
+        scope: SitePermissions.SCOPE_PERSISTENT,
+      });
     }
 
     // Add site protection permissions if needed.
@@ -685,6 +702,9 @@ export class nsZenSiteDataPanel {
         if (permission.id === "vapor-shield") {
           return "zen-site-data-vapor-shield-enabled";
         }
+        if (permission.id === "vapor-filter") {
+          return "zen-site-data-vapor-filter-enabled";
+        }
         return "zen-site-data-setting-allow";
       case SitePermissions.BLOCK:
       case SitePermissions.AUTOPLAY_BLOCKED_ALL:
@@ -693,6 +713,9 @@ export class nsZenSiteDataPanel {
         }
         if (permission.id === "vapor-shield") {
           return "zen-site-data-vapor-shield-disabled";
+        }
+        if (permission.id === "vapor-filter") {
+          return "zen-site-data-vapor-filter-disabled";
         }
         return "zen-site-data-setting-block";
       default:
@@ -747,6 +770,11 @@ export class nsZenSiteDataPanel {
       this.document.l10n.setAttributes(
         nameLabel,
         "zen-site-data-setting-vapor-shield"
+      );
+    } else if (id === "vapor-filter") {
+      this.document.l10n.setAttributes(
+        nameLabel,
+        "zen-site-data-setting-vapor-filter"
       );
     } else {
       let label = SitePermissions.getPermissionLabel(permission.id);
@@ -879,6 +907,11 @@ export class nsZenSiteDataPanel {
       }
     } else if (permission.id === "vapor-shield") {
       lazy.VaporShield.setSitePermission(
+        gBrowser.currentURI,
+        newState === SitePermissions.ALLOW
+      );
+    } else if (permission.id === "vapor-filter") {
+      lazy.VaporFilter.setSitePermission(
         gBrowser.currentURI,
         newState === SitePermissions.ALLOW
       );

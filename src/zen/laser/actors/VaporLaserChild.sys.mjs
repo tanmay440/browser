@@ -137,10 +137,14 @@ export class VaporLaserChild extends JSWindowActorChild {
   #lastZap = null;
   #toastTimer = null;
   #vaporizing = false;
+  #breakerCounterHandler = null;
 
   receiveMessage(message) {
     if (message.name === "VaporLaser:State") {
       this.#setActive(!!message.data?.active);
+    } else if (message.name === "VaporShieldBreaker:Counter") {
+      this.#killCount += Number(message.data?.amount || 0);
+      this.#updateCounter();
     }
   }
 
@@ -196,6 +200,11 @@ export class VaporLaserChild extends JSWindowActorChild {
     const root = document.body || document.documentElement;
     root.append(this.#vignette, this.#highlight, this.#hud);
     this.#updateCounter();
+    this.#breakerCounterHandler = event => {
+      this.#killCount += Number(event.detail?.amount || 0);
+      this.#updateCounter();
+    };
+    document.addEventListener("vapor-shield-breaker-kill", this.#breakerCounterHandler);
 
     document.addEventListener("pointermove", this, true);
     document.addEventListener("click", this, true);
@@ -207,6 +216,10 @@ export class VaporLaserChild extends JSWindowActorChild {
     document?.removeEventListener("pointermove", this, true);
     document?.removeEventListener("click", this, true);
     document?.removeEventListener("keydown", this, true);
+    if (this.#breakerCounterHandler) {
+      document?.removeEventListener("vapor-shield-breaker-kill", this.#breakerCounterHandler);
+      this.#breakerCounterHandler = null;
+    }
     document?.documentElement?.removeAttribute(UI_ATTRIBUTE);
 
     this.#style?.remove();
@@ -320,6 +333,19 @@ export class VaporLaserChild extends JSWindowActorChild {
       return;
     }
 
+    if (this.#looksLikeShieldOverlay(clicked)) {
+      // Laser deliberately hands anti-adblock clicks to the document-start
+      // Filter actor. The breaker owns the five-step restore sequence.
+      this.document.dispatchEvent(new CustomEvent("vapor-shield-breaker-target", {
+        bubbles: true,
+        detail: { target: clicked },
+      }));
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
@@ -334,6 +360,23 @@ export class VaporLaserChild extends JSWindowActorChild {
     this.#vaporize(target);
   }
 
+  #looksLikeShieldOverlay(element) {
+    if (!element || this.#isUI(element)) {
+      return false;
+    }
+    const style = this.document.defaultView.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const text = (element.innerText || element.textContent || "").slice(0, 4000);
+    const zIndex = Number.parseInt(style.zIndex, 10);
+    return (
+      (style.position === "fixed" || style.position === "absolute") &&
+      Number.isFinite(zIndex) && zIndex > 1000 &&
+      ((rect.width > this.document.defaultView.innerWidth * 0.8 &&
+        rect.height > this.document.defaultView.innerHeight * 0.8) ||
+        /disable your ad blocker|ad blocker detected|please whitelist|turn off your adblocker|ad blocking software|content is blocked|allow ads|support us by/i.test(text))
+    );
+  }
+
   #eventElement(event) {
     const path = event.composedPath?.() || [];
     const elementNode = this.document.defaultView.Node.ELEMENT_NODE;
@@ -345,7 +388,7 @@ export class VaporLaserChild extends JSWindowActorChild {
   }
 
   #isUI(element) {
-    return !!element.closest?.(`[${UI_ATTRIBUTE}]`);
+    return !!element.closest?.(`[${UI_ATTRIBUTE}], [data-vapor-filter-ui]`);
   }
 
   #findTarget(element) {

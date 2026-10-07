@@ -23,6 +23,10 @@ const { VaporShield } = ChromeUtils.importESModule(
   "resource:///modules/zen/shield/VaporShield.sys.mjs"
 );
 
+const { VaporFilter } = ChromeUtils.importESModule(
+  "resource:///modules/zen/filter/VaporFilter.sys.mjs"
+);
+
 var gVaporShieldSettings = {
   _initialized: false,
   _allRules: "",
@@ -43,17 +47,43 @@ var gVaporShieldSettings = {
     document.getElementById("vaporShieldReset").addEventListener("command", () => {
       VaporShield.resetUserRules().then(() => this._refresh());
     });
+    document.getElementById("vaporFilterSave")?.addEventListener("command", () => {
+      const rules = document.getElementById("vaporFilterRules");
+      VaporFilter.setElementFilterRules(rules.value).then(() => this._refreshFilter());
+    });
+    document.getElementById("vaporOverlayPhrasesSave")?.addEventListener("command", () => {
+      const phrases = document.getElementById("vaporOverlayPhrases");
+      VaporFilter.setOverlayPhrases(phrases.value).then(() => this._refreshFilter());
+    });
+    document.getElementById("vaporOverlayMemoryClear")?.addEventListener("command", () => {
+      VaporFilter.clearOverlayMemory().then(() => this._refreshFilter());
+    });
     search.addEventListener("input", () => this._render());
     window.addEventListener("unload", () => {
       this._initialized = false;
     }, { once: true });
 
-    await this._refresh();
+    await Promise.all([this._refresh(), this._refreshFilter()]);
   },
 
   async _refresh() {
     this._allRules = await VaporShield.getAllRules();
     this._render();
+  },
+
+  async _refreshFilter() {
+    const rules = document.getElementById("vaporFilterRules");
+    const count = document.getElementById("vaporFilterRuleCount");
+    const memory = document.getElementById("vaporOverlayMemory");
+    const phrases = document.getElementById("vaporOverlayPhrases");
+    if (!rules || !count || !memory || !phrases) {
+      return;
+    }
+    const text = await VaporFilter.getElementFilterRules();
+    rules.value = text;
+    count.textContent = `${text.split(/\\r?\\n/).filter(line => line.trim() && !line.trim().startsWith("#") && !line.trim().startsWith("!")).length} element rules`;
+    phrases.value = await VaporFilter.getOverlayPhrases();
+    memory.value = JSON.stringify(await VaporFilter.getOverlayMemory(), null, 2);
   },
 
   _render() {
@@ -1354,6 +1384,11 @@ Preferences.addAll([
     id: "zen.window-sync.sync-only-pinned-tabs",
     type: "bool",
     default: false,
+  },
+  {
+    id: "vapor.filter.enabled",
+    type: "bool",
+    default: true,
   },
   {
     id: "vapor.shield.enabled",

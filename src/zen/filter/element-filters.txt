@@ -1,0 +1,53 @@
+! Vapor Browser default cosmetic filters. Syntax: scope##selector; @@ lines are exceptions.
+! Known advertising custom elements
+##ad-slot
+##ad-banner
+##ad-container
+##ads-by-google
+##google-ad
+##amp-ad
+##amp-auto-ads
+##gpt-ad
+##display-ad
+##sponsor-ad
+##advertisement-container
+##dfp-ad
+##outbrain-widget
+##taboola-widget
+##taboola-block
+##yandex_rtb
+##[data-ad]
+##[data-advertisement]
+##[data-ad-slot]
+##[data-testid*="ad-"]
+! Ad iframe patterns and tracking scripts
+##iframe[src*="doubleclick.net"]
+##iframe[src*="googlesyndication.com"]
+##iframe[src*="adnxs.com"]
+##iframe[src*="adform.net"]
+##iframe[src*="adsystem.com"]
+##script[src*="doubleclick.net"]
+##script[src*="googlesyndication.com"]
+##script[src*="adnxs.com"]
+##script[src*="connect.facebook.net"]
+##script[src*="google-analytics.com"]
+##script[src*="googletagmanager.com"]
+! Object and embed sources
+##object[data*="ads"]
+##object[data*="doubleclick"]
+##object[data]
+##embed[src*="ads"]
+##embed[src*="doubleclick"]
+##video[src*="ads"]
+##audio[src*="ads"]
+##source[src*="ads"]
+##track[src*="ads"]
+! Tracking pixels and prefetches
+##link[rel="preload"][as="script"]
+##link[rel="prefetch"]
+##link[rel="preconnect"][href*="doubleclick"]
+##img[src*="pixel"]
+##img[src*="beacon"]
+! A site can explicitly retain a matching element with an exception.
+@@example.invalid##.vapor-filter-example
+@@*##iframe[src*="youtube.com"]

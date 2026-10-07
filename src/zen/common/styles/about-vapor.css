@@ -45,4 +45,9 @@ dl div { border-bottom: 1px solid color-mix(in srgb, var(--muted) 25%, transpare
 dt { color: var(--muted); }
 dd { font-variant-numeric: tabular-nums; margin: 0; }
 .foundation { color: var(--muted); font-size: 13px; margin: 0; }
+.activity { border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); margin-top: 28px; padding-top: 22px; text-align: left; }
+.activity h2 { font-size: 19px; margin: 0 0 5px; }
+.activity p { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+.activity ol { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0; max-height: 220px; overflow: auto; padding-left: 22px; }
+.activity strong { color: var(--text); }
 .telemetry p { line-height: 1.55; }
