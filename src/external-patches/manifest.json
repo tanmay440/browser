@@ -40,11 +40,6 @@
     }
   },
   {
-    "type": "phabricator",
-    "id": "D321446",
-    "name": "Issue 14710"
-  },
-  {
     "type": "local",
     "path": "firefox/override_cert_checks_temp.patch"
   },

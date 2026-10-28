@@ -3,10 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 EXTRA_JS_MODULES += [
+  "modules/VaporProfileDirectories.sys.mjs",
   "sys/ZenActorsManager.sys.mjs",
   "sys/ZenCustomizableUI.sys.mjs",
   "sys/ZenUIMigration.sys.mjs",
-  "modules/VaporProfileDirectories.sys.mjs",
 ]
 
 EXTRA_JS_MODULES.zen.ui += [
